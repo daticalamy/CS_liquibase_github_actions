@@ -55,7 +55,6 @@ jobs:
     environment: ${{ inputs.environment }}
     
     steps:
-      - uses: AutoModality/action-clean@v1
       - uses: actions/checkout@v3
       - uses: liquibase-github-actions/flow@v4.26.0
         with:
