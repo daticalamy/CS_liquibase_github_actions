@@ -12,7 +12,7 @@ stages:
         command: snapshot
         cmdArgs: 
           {  snapshot-format: json }
-        globalArgs: { output-file: 's3://${BUCKET}/gh-snapshots/DEV-snapshot.json' }
+        globalArgs: { output-file: 's3://${BUCKET}/gh-snapshots/${ENV}-snapshot.json' }
         
       - type: shell
-        command: echo 'Snapshot saved to s3://${BUCKET}/gh-snapshots/DEV-snapshot.json'
+        command: echo 'Snapshot saved to s3://${BUCKET}/gh-snapshots/${ENV}-snapshot.json'
