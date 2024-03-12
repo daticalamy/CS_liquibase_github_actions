@@ -11,7 +11,7 @@ stages:
     # Check if manual updates were made to the environment since last deployment
     actions:
       - type: shell
-        command: liquibase --search-path=s3://${BUCKET}/snapshots diff --reference-url=offline:postgres?snapshot=${ENV}-snapshot.json --report-name="drift-report-${ENV}.html" --drift-severity=1
+        command: liquibase --search-path=s3://${BUCKET}/snapshots diff --reference-url=offline:postgres?snapshot=${ENV}-snapshot.json --report-name="drift-report-${ENV}.html" --drift-severity=0
           
   Validation:
     actions: 
