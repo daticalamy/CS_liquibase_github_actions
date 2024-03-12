@@ -2,7 +2,6 @@
 ##########  learn more http://docs.liquibase.com/flow  ##########
 
 globalVariables:
-  JIRA: ${JIRA:-null}
   ENV: ${ENVIRONMENT}
   BUCKET: ${AWS_S3_BUCKET}
 

@@ -1,9 +1,10 @@
 ####################################################################
-#  GitHub Action to take snapshot for use in Drift Detection
-#  database changes using Liquibase Pro and S3.
+#  GitHub Action to perform an environment-targeted deployment of
+#  database changes using Liquibase Pro, Liquibase Pro Flows,
+#  Custom Quality checks and S3.
 #####################################################################
-name: 'Liquibase Pro Snapshot'
-run-name: ${{ inputs.environment}} snapshot by ${{ github.actor }}
+name: 'Liquibase Pro Deployment Job'
+run-name: ${{ inputs.environment}} deployment of current repo by ${{ github.actor }}
 
 on:
 
@@ -12,7 +13,7 @@ on:
     inputs:
       # The type 'environment' will automatically pull in the environments created in GitHub
       environment:
-        description: 'Environment to snapshot'
+        description: 'Environment for deployment'
         type: environment
         required: true
 
@@ -48,10 +49,10 @@ env:
 
 jobs:
   #########################################################################
-  #  Snapshot
+  #  Deploy
   #########################################################################
 
-  snapshot:
+  database-deploy:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
     
@@ -72,4 +73,20 @@ jobs:
     - name: Flows
       uses: liquibase-github-actions/flow@v4.26.0
       with:
-          flowFile: "liquibase-snapshot.flowfile.yaml"
+          flowFile: "liquibase-deploy.flowfile.yaml"
+          
+####################################################################
+#  Artifact creation for Reports
+####################################################################
+  create-reports-artifact:
+    needs: [database-deploy]
+    runs-on: [self-hosted]
+    environment: ${{ inputs.environment }}
+    if: always()
+
+    steps:
+      # Save reports as artifact
+      - uses: actions/upload-artifact@v3
+        with:
+          name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
+          path: reports/
