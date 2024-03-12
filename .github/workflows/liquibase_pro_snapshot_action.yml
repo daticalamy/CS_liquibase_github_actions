@@ -55,8 +55,8 @@ jobs:
     environment: ${{ inputs.environment }}
     
     steps:
-      # Validate parseability of the Flow file
-      - name: Validate flow
-        run: |
-          whoami
-          pwd
+      - uses: actions/checkout@v3
+      - uses: liquibase-github-actions/flow@v4.26.0
+        with:
+          # The path to the configuration yaml file which contains one or more "stages" of commands to be executed in a liquibase flow operation.
+          flowFile: "liquibase-snapshot.flowfile.yaml"
