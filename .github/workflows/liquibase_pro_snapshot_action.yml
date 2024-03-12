@@ -44,6 +44,7 @@ env:
 
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
   LIQUIBASE_SEARCH_PATH: flows
+  ENVIRONMENT: ${{ inputs.environment }}
 
 jobs:
   #########################################################################
