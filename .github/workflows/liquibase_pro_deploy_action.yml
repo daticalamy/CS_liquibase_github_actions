@@ -45,6 +45,10 @@ env:
 
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
   LIQUIBASE_SEARCH_PATH: flows
+  
+  # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
+  LIQUIBASE_COMMAND_CHANGELOG_FILE: "db.changelog-main.yaml"
+  
   ENVIRONMENT: ${{ inputs.environment }}
 
 jobs:
