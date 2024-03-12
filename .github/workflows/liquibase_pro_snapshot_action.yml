@@ -54,9 +54,20 @@ jobs:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
     
+    # Specify the Docker container to use for the job
+    container:
+      image: liquibase/liquibase:latest
+      
     steps:
-      - uses: actions/checkout@v3
-      - uses: liquibase-github-actions/flow@v4.26.0
-        with:
-          # The path to the configuration yaml file which contains one or more "stages" of commands to be executed in a liquibase flow operation.
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Install Extensions Using LPM
+      run: |
+        lpm update
+        lpm add s3
+      
+    - name: Flows
+      uses: liquibase-github-actions/flow@v4.26.0
+      with:
           flowFile: "liquibase-snapshot.flowfile.yaml"
