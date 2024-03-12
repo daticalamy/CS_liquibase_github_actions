@@ -55,6 +55,13 @@ jobs:
     environment: ${{ inputs.environment }}
     
     steps:
+      # Validate parseability of the Flow file
+      - name: Validate flow
+        run: |
+          whoami
+          pwd
+    
+    steps:
       - uses: actions/checkout@v3
       - uses: liquibase-github-actions/flow@v4.26.0
         with:
