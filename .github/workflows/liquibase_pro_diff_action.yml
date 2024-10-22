@@ -80,6 +80,8 @@ jobs:
 
     - name: Base64 decode
       uses: akiojin/decode-base64-github-action@v0.1.0
+      with:
+        base64: <Base64>
       
     - name: Status
       uses: liquibase-github-actions/status@v4.29.2
