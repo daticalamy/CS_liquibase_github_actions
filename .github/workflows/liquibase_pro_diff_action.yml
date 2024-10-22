@@ -94,7 +94,7 @@ jobs:
       uses: liquibase-github-actions/status@v4.29.2
       with:
         changelogFile: "db.changelog-main.yaml"
-        url: ${{ secrets.LIQUIBASE_DIFF_URL }}
+        url: ${{ secrets.LIQUIBASE_DIFF_URL }}   ${{ format('{0}{1}', secrets.LIQUIBASE_DIFF_URL, steps.decode-base64.outputs.output-path) }}
         headless: true
         licenseKey: ${{ secrets.LIQUIBASE_LICENSE_KEY }}
         logLevel: INFO
