@@ -86,7 +86,7 @@ jobs:
         
     - name: Test value
       run: |
-        echo ${{ format('{0}{1}', secrets.LIQUIBASE_DIFF_URL, steps.decode-base64.outputs.decoded) }}
+        echo ${{ format('{0}', secrets.LIQUIBASE_DIFF_URL }}
       
     # - name: Status
       # uses: liquibase-github-actions/status@v4.29.2
