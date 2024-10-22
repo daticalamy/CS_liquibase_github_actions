@@ -80,6 +80,7 @@ jobs:
 
     - name: Base64 decode
       uses: akiojin/decode-base64-github-action@v0.1.0
+      id: decode-base64
       with:
         base64: <Base64>
       
