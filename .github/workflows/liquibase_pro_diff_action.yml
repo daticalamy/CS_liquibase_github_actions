@@ -90,14 +90,14 @@ jobs:
         echo "Path=${{ steps.decode-base64.outputs.output-path }}"
         cat ${{ steps.decode-base64.outputs.output-path }}
       
-     - name: Status
-       uses: liquibase-github-actions/status@v4.29.2
-       with:
-         changelogFile: "db.changelog-main.yaml"
-         url: ${{ secrets.LIQUIBASE_DIFF_URL }}
-         headless: true
-         licenseKey: ${{ secrets.LIQUIBASE_LICENSE_KEY }}
-         logLevel: INFO
+    - name: Status
+      uses: liquibase-github-actions/status@v4.29.2
+      with:
+        changelogFile: "db.changelog-main.yaml"
+        url: ${{ secrets.LIQUIBASE_DIFF_URL }}
+        headless: true
+        licenseKey: ${{ secrets.LIQUIBASE_LICENSE_KEY }}
+        logLevel: INFO
 
     # - name: Diff
       # uses: liquibase-github-actions/diff@v4.29.2
