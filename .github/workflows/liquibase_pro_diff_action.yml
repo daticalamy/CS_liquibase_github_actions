@@ -74,6 +74,7 @@ jobs:
       
     - name: Install Extensions Using LPM
       run: |
+        whoami
         lpm update
         lpm add liquibase-s3-extension
       
