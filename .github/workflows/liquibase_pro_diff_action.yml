@@ -77,9 +77,11 @@ jobs:
         whoami
         lpm update
         lpm add liquibase-s3-extension
+
+    - name: Base64 decode
+      uses: akiojin/decode-base64-github-action@v0.1.0
       
     - name: Status
-      uses: akiojin/decode-base64-github-action@v0.1.0
       uses: liquibase-github-actions/status@v4.29.2
       with:
         changelogFile: "db.changelog-main.yaml"
