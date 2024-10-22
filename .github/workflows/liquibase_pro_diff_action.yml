@@ -15,10 +15,6 @@ on:
         description: 'target environment to diff'
         type: environment
         required: true
-      ref_environment:
-        description: 'ref environment to diff'
-        type: environment
-        required: true
 
 ####################################################################
 #  Set up the environment
@@ -66,7 +62,6 @@ jobs:
   diff:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
-    ref_environment: ${{ inputs.ref_environment }}
     
     # Specify the Docker container to use for the job
     container:
