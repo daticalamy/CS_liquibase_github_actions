@@ -89,7 +89,7 @@ jobs:
       run: |
         echo "Path=${{ steps.decode-base64.outputs.output-path }}"
         cat ${{ steps.decode-base64.outputs.output-path }}
-        liquibase status --changelog-file="db.changelog-main.yaml" --url=${{ format('{0}{1}', vars.LIQUIBASE_DIFF_URL, steps.decode-base64.outputs.output-path) }} --license-key=${{ secrets.LIQUIBASE_LICENSE_KEY }}
+        liquibase status --changelog-file="db.changelog-main.yaml" --url="${{ format('{0}{1}', vars.LIQUIBASE_DIFF_URL, steps.decode-base64.outputs.output-path) }}" --license-key=${{ secrets.LIQUIBASE_LICENSE_KEY }}
         
       
     - name: Status
