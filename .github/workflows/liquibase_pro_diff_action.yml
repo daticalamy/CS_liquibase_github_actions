@@ -85,8 +85,8 @@ jobs:
     - name: Diff
       uses: liquibase-github-actions/diff@v4.29.2
       with:
-        referenceUrl: ""
-        url: ""
+        referenceUrl: ${{ secrets.LIQUIBASE_DIFF_REF_URL }}
+        url: ${{ secrets.LIQUIBASE_DIFF_URL }}
         headless: true
         licenseKey: ${{ secrets.LIQUIBASE_LICENSE_KEY }}
         logLevel: INFO
