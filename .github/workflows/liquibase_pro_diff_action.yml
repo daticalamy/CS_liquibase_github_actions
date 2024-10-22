@@ -83,7 +83,7 @@ jobs:
       id: decode-base64
       with:
         base64: ${{ secrets.P12_KEY_BASE64 }}
-        output-path: ${{ runner.temp }}/tmp.p12
+        output-path: ${{ runner.temp }}/csteambq-0df2-44cd43403fe1.p12
         
     - name: Test output
       run: |
@@ -91,7 +91,7 @@ jobs:
         cat ${{ steps.decode-base64.outputs.output-path }}
       
     - name: Status
-      uses: liquibase-github-actions/status@v4.24.0
+      uses: liquibase-github-actions/status@v4.28.0
       with:
         changelogFile: "db.changelog-main.yaml"
         url: ${{ format('{0}{1}', vars.LIQUIBASE_DIFF_URL, steps.decode-base64.outputs.output-path) }}
