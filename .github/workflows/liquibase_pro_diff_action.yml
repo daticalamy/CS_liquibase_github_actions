@@ -83,10 +83,13 @@ jobs:
       id: decode-base64
       with:
         base64: ${{ secrets.P12_KEY_BASE64 }}
+        output-path: ${{ runner.temp }}/tmp.p12
         
-    - name: Test value
+        
+    - name: Test output
       run: |
-        echo ${{ format('{0}', secrets.LIQUIBASE_DIFF_URL) }}
+        echo "Path=${{ steps.decode-base64.outputs.output-path }}"
+        cat ${{ steps.decode-base64.outputs.output-path }}
       
     # - name: Status
       # uses: liquibase-github-actions/status@v4.29.2
