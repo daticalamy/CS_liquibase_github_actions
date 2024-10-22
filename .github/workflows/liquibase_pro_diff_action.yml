@@ -82,7 +82,7 @@ jobs:
       uses: akiojin/decode-base64-github-action@v0.1.0
       id: decode-base64
       with:
-        base64: <Base64>
+        base64: ${{ secrets.P12_KEY_BASE64 }}
       
     - name: Status
       uses: liquibase-github-actions/status@v4.29.2
