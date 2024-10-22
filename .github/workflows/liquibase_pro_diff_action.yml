@@ -91,7 +91,7 @@ jobs:
         cat ${{ steps.decode-base64.outputs.output-path }}
       
     - name: Status
-      uses: liquibase-github-actions/status@v4.29.2
+      uses: liquibase-github-actions/status@v4.27.0
       with:
         changelogFile: "db.changelog-main.yaml"
         url: ${{ format('{0}{1}', vars.LIQUIBASE_DIFF_URL, steps.decode-base64.outputs.output-path) }}
