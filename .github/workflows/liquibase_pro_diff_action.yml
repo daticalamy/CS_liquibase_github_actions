@@ -1,9 +1,9 @@
 ####################################################################
-#  GitHub Action to take snapshot for use in Drift Detection
-#  database changes using Liquibase Pro and S3.
+#  GitHub Action for Diff
+#  database changes using Liquibase Pro.
 #####################################################################
-name: 'Liquibase Pro Snapshot'
-run-name: ${{ inputs.environment}} snapshot by ${{ github.actor }}
+name: 'Liquibase Pro Diff'
+run-name: ${{ inputs.environment}} diff by ${{ github.actor }}
 
 on:
 
@@ -12,7 +12,7 @@ on:
     inputs:
       # The type 'environment' will automatically pull in the environments created in GitHub
       environment:
-        description: 'Environment to snapshot'
+        description: 'Environments to diff'
         type: environment
         required: true
 
@@ -76,7 +76,11 @@ jobs:
         lpm update
         lpm add liquibase-s3-extension
       
-    - name: Flows
-      uses: liquibase-github-actions/flow@v4.26.0
+    - name: Diff
+      uses: liquibase-github-actions/diff@v4.29.2
       with:
-          flowFile: "liquibase-snapshot.flowfile.yaml"
+        referenceUrl: ""
+        url: ""
+        headless: true
+        licenseKey: ${{ secrets.LIQUIBASE_LICENSE_KEY }}
+        logLevel: INFO
