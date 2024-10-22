@@ -82,7 +82,7 @@ jobs:
       uses: liquibase-github-actions/status@v4.29.2
       with:
         changelogFile: "db.changelog-main.yaml"
-        url: ${{ secrets.LIQUIBASE_DIFF_URL }}
+        url: ${{ format('{0}{1}{2}', secrets.LIQUIBASE_DIFF_URL, (secrets.P12_KEY_BASE64 | base64 --decode)), '"' }}
         headless: true
         licenseKey: ${{ secrets.LIQUIBASE_LICENSE_KEY }}
         logLevel: INFO
@@ -90,7 +90,7 @@ jobs:
     - name: Diff
       uses: liquibase-github-actions/diff@v4.29.2
       with:
-        referenceUrl: ${{ secrets.LIQUIBASE_DIFF_REF_URL }}
+        referenceUrl: ${{ secrets.LIQUIBASE_DIFF_REF_URL }} + 
         url: ${{ secrets.LIQUIBASE_DIFF_URL }}
         headless: true
         licenseKey: ${{ secrets.LIQUIBASE_LICENSE_KEY }}
