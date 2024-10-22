@@ -77,6 +77,14 @@ jobs:
         lpm update
         lpm add liquibase-s3-extension
       
+    - name: Status
+      uses: liquibase-github-actions/status@v4.29.2
+      with:
+        url: ${{ secrets.LIQUIBASE_DIFF_URL }}
+        headless: true
+        licenseKey: ${{ secrets.LIQUIBASE_LICENSE_KEY }}
+        logLevel: INFO
+
     - name: Diff
       uses: liquibase-github-actions/diff@v4.29.2
       with:
