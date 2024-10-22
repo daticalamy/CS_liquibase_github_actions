@@ -89,6 +89,8 @@ jobs:
       run: |
         echo "Path=${{ steps.decode-base64.outputs.output-path }}"
         cat ${{ steps.decode-base64.outputs.output-path }}
+        liquibase status 
+        
       
     - name: Status
       uses: liquibase-github-actions/status@v4.28.0
