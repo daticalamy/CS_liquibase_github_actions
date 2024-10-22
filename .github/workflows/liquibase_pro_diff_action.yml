@@ -12,7 +12,11 @@ on:
     inputs:
       # The type 'environment' will automatically pull in the environments created in GitHub
       environment:
-        description: 'Environments to diff'
+        description: 'target environment to diff'
+        type: environment
+        required: true
+      ref_environment:
+        description: 'ref environment to diff'
         type: environment
         required: true
 
@@ -52,15 +56,17 @@ env:
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
   LIQUIBASE_SEARCH_PATH: flows
   ENVIRONMENT: ${{ inputs.environment }}
+  REF_ENVIRONMENT: ${{ inputs.ref_environment }}
 
 jobs:
   #########################################################################
-  #  Snapshot
+  #  Diff
   #########################################################################
 
-  snapshot:
+  diff:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
+    ref_environment: ${{ inputs.ref_environment }}
     
     # Specify the Docker container to use for the job
     container:
