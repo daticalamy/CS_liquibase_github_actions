@@ -75,7 +75,6 @@ jobs:
     - name: Install Extensions Using LPM
       run: |
         whoami
-        ls /var/bigquery
         lpm update
         lpm add liquibase-s3-extension
       
