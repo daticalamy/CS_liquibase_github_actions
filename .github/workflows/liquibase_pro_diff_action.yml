@@ -92,7 +92,7 @@ jobs:
   
     - name: LB status (no action)
       run: |
-        liquibase status --changelog-file="db.changelog-main.yaml" --url="${{ format('{0}{1}', vars.LIQUIBASE_DIFF_URL, steps.decode-base64.outputs.output-path) }}" --license-key=${{ secrets.LIQUIBASE_LICENSE_KEY }}  
+        liquibase status --changelog-file="db.changelog-main.yaml" --license-key="${{ secrets.LIQUIBASE_LICENSE_KEY }}" --url="${{ format('{0}{1}', vars.LIQUIBASE_DIFF_URL, steps.decode-base64.outputs.output-path) }}"  
       
     - name: Status
       uses: liquibase-github-actions/status@v4.28.0
