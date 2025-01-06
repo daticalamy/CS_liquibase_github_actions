@@ -3,7 +3,7 @@
 #  using Liquibase Pro 
 #####################################################################
 name: 'Liquibase Pro Policy Checks'
-run-name: ${{ inputs.environment}} snapshot by ${{ github.actor }}
+run-name: ${{ inputs.environment}} checks run by ${{ github.actor }}
 
 on:
 
