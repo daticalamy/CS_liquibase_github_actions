@@ -66,7 +66,7 @@ jobs:
       run: |
         lpm update
       
-    - name: Flows
-      uses: liquibase-github-actions/flow@v4.30.0
+    - name: Checks
+      uses: liquibase-github-actions/checks-run@v4.30.0
       with:
-          flowFile: "liquibase-checks.flowfile.yaml"
+          checksSettingsFile: liquibase.checks-settings.conf"
