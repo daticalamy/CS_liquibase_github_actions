@@ -2,7 +2,7 @@
 #  GitHub Action to run policy checks (including a 4.30.0 python check)
 #  using Liquibase Pro 
 #####################################################################
-name: 'Liquibase Pro Policy Checks'
+name: 'Liquibase Pro Policy Checks Default'
 run-name: ${{ inputs.environment}} checks run by ${{ github.actor }}
 
 on:
