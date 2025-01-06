@@ -46,10 +46,10 @@ env:
 
 jobs:
   #########################################################################
-  #  Snapshot
+  #  Policy checks
   #########################################################################
 
-  snapshot:
+  checks:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
     
@@ -69,4 +69,4 @@ jobs:
     - name: Flows
       uses: liquibase-github-actions/flow@v4.30.0
       with:
-          flowFile: "liquibase-snapshot.flowfile.yaml"
+          flowFile: "liquibase-checks.flowfile.yaml"
