@@ -69,6 +69,6 @@ jobs:
     - name: Checks
       uses: liquibase-github-actions/checks-run@v4.30.0
       with:
-          checksSettingsFile: liquibase.checks-settings.conf"
+          checksSettingsFile: "liquibase.checks-settings.conf"
           checksScope: "changelog"
           changelogFile: "db.changelog-main.yaml"
