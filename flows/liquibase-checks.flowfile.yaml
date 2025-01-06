@@ -1,0 +1,11 @@
+##########           LIQUIBASE FLOWFILE                ##########
+##########  learn more http://docs.liquibase.com/flow  ##########
+
+globalVariables:
+  ENV: ${ENVIRONMENT}
+
+stages:
+  Snapshot:
+    actions:
+      - type: liquibase
+        command: checks show
