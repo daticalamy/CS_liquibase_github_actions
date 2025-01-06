@@ -43,6 +43,7 @@ env:
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
   LIQUIBASE_SEARCH_PATH: flows
   ENVIRONMENT: ${{ inputs.environment }}
+  LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_SETTINGS_FILE: liquibase.checks-settings.conf
 
 jobs:
   #########################################################################
@@ -69,6 +70,5 @@ jobs:
     - name: Checks
       uses: liquibase-github-actions/checks-run@v4.30.0
       with:
-          checksSettingsFile: "liquibase.checks-settings.conf"
           checksScope: "changelog"
           changelogFile: "db.changelog-main.yaml"
