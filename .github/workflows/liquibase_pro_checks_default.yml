@@ -52,11 +52,6 @@ jobs:
   checks:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
-    
-    # Specify the Docker container to use for the job
-    container:
-      image: liquibase/liquibase:latest
-      options: --user root
       
     steps:
     - uses: actions/checkout@v3
