@@ -65,6 +65,7 @@ jobs:
     - name: Install Extensions Using LPM
       run: |
         pwd
+        ls
       
     - name: Checks
       uses: liquibase-github-actions/checks-run@v4.30.0
