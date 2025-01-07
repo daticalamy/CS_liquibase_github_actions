@@ -50,6 +50,7 @@ env:
   # LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_SCRIPTS_PATH: pythonchecks
   ENVIRONMENT: ${{ inputs.environment }}
   XDG_CACHE_HOME: /tmp
+  LIQUIBASE_SCRIPT_PYTHON_EXECUTABLE_PATH: checks/pii_poc_env/bin/python
 
 jobs:
   #########################################################################
@@ -75,6 +76,7 @@ jobs:
         ls
         lpm update
         lpm add liquibase-checks
+        
       
     - name: Checks
       uses: liquibase-github-actions/checks-run@v4.30.0
