@@ -44,6 +44,7 @@ env:
   LIQUIBASE_COMMAND_CHANGELOG_FILE: db.changelog-main.yaml
   LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_SCOPE: changelog
   LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_SETTINGS_FILE: liquibase.checks-settings.conf
+  LIQUIBASE_COMMAND_CHECKS_RUN_AUTO_ENABLE_NEW_CHECKS: true
   LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
   ENVIRONMENT: ${{ inputs.environment }}
 
