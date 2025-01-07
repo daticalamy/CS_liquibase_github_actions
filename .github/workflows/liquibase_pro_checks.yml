@@ -75,6 +75,7 @@ jobs:
         ls
         cd ..
         lpm update
+        lpm add liquibase-checks
       
     - name: Checks
       uses: liquibase-github-actions/checks-run@v4.30.0
