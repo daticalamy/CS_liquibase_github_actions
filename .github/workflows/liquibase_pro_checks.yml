@@ -49,6 +49,7 @@ env:
   LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
   # LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_SCRIPTS_PATH: pythonchecks
   ENVIRONMENT: ${{ inputs.environment }}
+  XDG_CACHE_HOME: tmp
 
 jobs:
   #########################################################################
@@ -71,9 +72,7 @@ jobs:
     - name: Install Extensions Using LPM
       run: |
         pwd
-        cd checks
         ls
-        cd ..
         lpm update
         lpm add liquibase-checks
       
