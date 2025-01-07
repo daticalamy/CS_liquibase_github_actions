@@ -73,4 +73,3 @@ jobs:
           checksScope: "changelog"
           changelogFile: "db.changelog-main.yaml"
           checksSettingsFile: "liquibase.checks-settings.conf"
-          changelogFile: "main.yaml"
