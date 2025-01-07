@@ -1,10 +1,10 @@
 databaseChangeLog:
   - include:
-      file: changelogs/main.yaml
+      file: main.yaml
       relativeToChangelogFile: true
       
   - includeAll:
-      path: changelogs/logic
+      path: logic
       relativeToChangelogFile: true
       errorIfMissingOrEmpty: false
       
