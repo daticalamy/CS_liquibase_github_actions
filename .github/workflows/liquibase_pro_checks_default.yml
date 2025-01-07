@@ -59,4 +59,4 @@ jobs:
       with:
         changelogFile: "main.yaml"
         checksScope: "changelog"
-        checksSettingsFile: "liquibase.checks-settings.conf"
+        checksSettingsFile: "checks/liquibase.checks-settings.conf"
