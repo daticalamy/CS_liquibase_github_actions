@@ -77,6 +77,6 @@ jobs:
         lpm add liquibase-s3-extension
       
     - name: Flows
-      uses: liquibase-github-actions/flow@v4.26.0
+      uses: liquibase-github-actions/flow@v4.30.0
       with:
           flowFile: "liquibase-snapshot.flowfile.yaml"
