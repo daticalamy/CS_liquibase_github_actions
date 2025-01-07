@@ -53,7 +53,7 @@ jobs:
   #########################################################################
 
   checks:
-    runs-on: [self-hosted]
+    runs-on: [ubuntu-latest]
     environment: ${{ inputs.environment }}
     
     # Specify the Docker container to use for the job
