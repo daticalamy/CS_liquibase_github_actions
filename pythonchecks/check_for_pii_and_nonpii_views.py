@@ -6,9 +6,9 @@
 ### Helpers come from Liquibase
 ###
 import sys
+import requests
 import liquibase_utilities
 import re
-import requests
 import base64
 import os
 
