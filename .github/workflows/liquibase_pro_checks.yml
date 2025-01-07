@@ -41,9 +41,9 @@ env:
   LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: gh
 
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
-  LIQUIBASE_SEARCH_PATH: flows
+  LIQUIBASE_SEARCH_PATH: flows, checks
   ENVIRONMENT: ${{ inputs.environment }}
-  LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_SETTINGS_FILE: liquibase.checks-settings.conf
+  LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_SETTINGS_FILE: checks/liquibase.checks-settings.conf
 
 jobs:
   #########################################################################
