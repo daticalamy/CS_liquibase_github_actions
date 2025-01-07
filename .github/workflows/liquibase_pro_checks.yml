@@ -58,7 +58,7 @@ jobs:
     
     # Specify the Docker container to use for the job
     container:
-      image: liquibase/liquibase:latest
+      image: liquibase:latest
       options: --user root
       
     steps:
