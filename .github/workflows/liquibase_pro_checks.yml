@@ -45,7 +45,7 @@ env:
   LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_SCOPE: changelog
   LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_SETTINGS_FILE: liquibase.checks-settings.conf
   LIQUIBASE_COMMAND_CHECKS_RUN_AUTO_ENABLE_NEW_CHECKS: true
-  LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
+  LIQUIBASE_SEARCH_PATH: flows, checks, changelogs, pythonchecks
   ENVIRONMENT: ${{ inputs.environment }}
 
 jobs:
