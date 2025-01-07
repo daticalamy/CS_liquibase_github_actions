@@ -57,5 +57,6 @@ jobs:
     - uses: actions/checkout@v3
     - uses: liquibase-github-actions/checks-run@v4.30.0
       with:
-        changelogFile: "db.changelog-main.yaml"
+        changelogFile: "main.yaml"
         checksScope: "changelog"
+        classpath: 'changelogs'
