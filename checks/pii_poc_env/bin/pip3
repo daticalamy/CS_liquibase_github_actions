@@ -1,4 +1,4 @@
-#!/home/centos/py_virt_env/graalpy_virtualenv/pii_poc_env2/bin/graalpy
+#!/home/centos/py_virt_env/graalpy_virtualenv/pii_poc_env/bin/graalpy
 # -*- coding: utf-8 -*-
 import re
 import sys
