@@ -20,7 +20,7 @@ REPO_OWNER = "daticalamy"  # GitHub username or organization
 REPO_NAME = "CS_BigQuery"  # Repository name
 #BRANCH = "main"  # Branch name, usually 'main'
 BRANCH = os.environ.get("CURRENT_BRANCH")
-print(f"CURRENT_BRANCH = {BRANCH}")
+#print(f"CURRENT_BRANCH = {BRANCH}")
 
 # GitHub authentication token - Required for private repos
 #GITHUB_TOKEN = "github_pat_11....." 
