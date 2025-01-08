@@ -74,6 +74,7 @@ jobs:
       
     - name: Install Extensions Using LPM
       run: |
+        pwd
         lpm update
         lpm add liquibase-checks
         
