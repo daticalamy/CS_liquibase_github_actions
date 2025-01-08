@@ -51,6 +51,7 @@ env:
   ENVIRONMENT: ${{ inputs.environment }}
   XDG_CACHE_HOME: /tmp
   LIQUIBASE_SCRIPT_PYTHON_EXECUTABLE_PATH: checks/pii_poc_env/bin/python
+  CURRENT_BRANCH: main
 
 jobs:
   #########################################################################
