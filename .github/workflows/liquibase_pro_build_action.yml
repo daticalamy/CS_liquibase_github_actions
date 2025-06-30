@@ -53,7 +53,7 @@ env:
   LIQUIBASE_COMMAND_REFERENCE_DEFAULT_SCHEMA_NAME: gh
 
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
-  LIQUIBASE_SEARCH_PATH: flows
+  LIQUIBASE_SEARCH_PATH: flows,changelogs
   
   # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
   LIQUIBASE_COMMAND_CHANGELOG_FILE: "changelogs/db.changelog-main.yaml"
