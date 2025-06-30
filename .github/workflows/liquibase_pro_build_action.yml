@@ -99,7 +99,7 @@ jobs:
 
     steps:
       # Save reports as artifact
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
           path: reports/
