@@ -44,10 +44,10 @@ env:
   
   # Liquibase schema: Specified to allow flexibility in storage of Liquibase Change Tracking Tables
   # See https://docs.liquibase.com/parameters/liquibase-schema-name.html
-  LIQUIBASE_LIQUIBASE_SCHEMA_NAME: gh
+  LIQUIBASE_LIQUIBASE_SCHEMA_NAME: LB
   
   # Default schema: Specify schema for all changes
-  LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: gh
+  #LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: gh
 
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
   LIQUIBASE_SEARCH_PATH: flows
@@ -77,6 +77,6 @@ jobs:
         lpm add liquibase-s3-extension
       
     - name: Flows
-      uses: liquibase-github-actions/flow@v4.30.0
+      uses: liquibase-github-actions/flow@v4.32.0
       with:
           flowFile: "liquibase-snapshot.flowfile.yaml"

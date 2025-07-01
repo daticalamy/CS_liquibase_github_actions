@@ -11,7 +11,7 @@ stages:
     # Check if manual updates were made to the environment since last deployment
     actions:
       - type: shell
-        command: liquibase --search-path=s3://${BUCKET}/snapshots diff --reference-url=offline:postgres?snapshot=${ENV}-snapshot.json --report-name="drift-report-${ENV}.html" --drift-severity=0
+        command: liquibase --search-path=s3://${BUCKET}/gh_sqlserver_snapshots/ diff --reference-url=offline:mssql?snapshot=${ENV}-snapshot.json --report-name="drift-report-${ENV}.html" --drift-severity=0
           
   Validation:
     actions: 
@@ -55,10 +55,10 @@ stages:
         command: snapshot
         cmdArgs: 
           {  snapshot-format: json }
-        globalArgs: { output-file: 's3://${BUCKET}/snapshots/${ENV}-snapshot.json' }
+        globalArgs: { output-file: 's3://${BUCKET}/gh_sqlserver_snapshots/${ENV}-snapshot.json' }
         
       - type: shell
-        command: echo 'Updated snapshot saved to s3://${BUCKET}/snapshots/${ENV}-snapshot.json'
+        command: echo 'Updated snapshot saved to s3://${BUCKET}/gh_sqlserver_snapshots/${ENV}-snapshot.json'
 
 ## The endStage ALWAYS RUNS. 
 ## So put actions here which you desire to perform whether previous stages' actions succeed or fail.

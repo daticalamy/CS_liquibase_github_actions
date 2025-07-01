@@ -45,17 +45,17 @@ env:
 
   # Liquibase schema: Specified to allow flexibility in storage of Liquibase Change Tracking Tables
   # See https://docs.liquibase.com/parameters/liquibase-schema-name.html
-  LIQUIBASE_LIQUIBASE_SCHEMA_NAME: gh
+  LIQUIBASE_LIQUIBASE_SCHEMA_NAME: LB
   
   # Default schema: Specify schema for all changes
-  LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: gh
-  LIQUIBASE_COMMAND_REFERENCE_DEFAULT_SCHEMA_NAME: gh
+  # LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: Sales
+  # LIQUIBASE_COMMAND_REFERENCE_DEFAULT_SCHEMA_NAME: Sales
 
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
-  LIQUIBASE_SEARCH_PATH: flows
+  LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
   
   # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
-  LIQUIBASE_COMMAND_CHANGELOG_FILE: "db.changelog-main.yaml"
+  LIQUIBASE_COMMAND_CHANGELOG_FILE: db.changelog-main.yaml
   
   ENVIRONMENT: ${{ inputs.environment }}
 
