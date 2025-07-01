@@ -83,7 +83,7 @@ jobs:
         lpm add liquibase-s3-extension
       
     - name: Flows
-      uses: liquibase-github-actions/flow@v4.26.0
+      uses: liquibase-github-actions/flow@v4.32.0
       with:
           flowFile: "liquibase-deploy.flowfile.yaml"
           
@@ -98,7 +98,7 @@ jobs:
 
     steps:
       # Save reports as artifact
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
           path: reports/
