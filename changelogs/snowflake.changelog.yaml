@@ -4,7 +4,6 @@ databaseChangeLog:
     author:  liquibase-docs
     changes:
     -  createTable:
-        catalogName:  department
         columns:
         -  column:
             name:  address
