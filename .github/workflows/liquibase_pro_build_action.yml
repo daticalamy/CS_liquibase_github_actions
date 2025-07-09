@@ -67,8 +67,9 @@ env:
   
   ENVIRONMENT: ${{ inputs.environment }}
   LB_TAG: ${{ github.event.inputs.lb_tag || github.run_number }}
-  LIQUIBASE_REPORT_PATH: s3://asmith-s3-extension-demo/gha_reports
-  LIQUIBASE_LOG_LEVEL: FINE
+  LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
+  # Values: OFF, SEVERE, WARNING, INFO, FINE
+  LIQUIBASE_LOG_LEVEL: INFO
 
 jobs:
   #########################################################################
