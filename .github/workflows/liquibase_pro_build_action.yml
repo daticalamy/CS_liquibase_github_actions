@@ -66,6 +66,7 @@ env:
   
   ENVIRONMENT: ${{ inputs.environment }}
   LB_TAG: ${{ github.event.inputs.lb_tag || github.run_number }}
+  LIQUIBASE_REPORTS_PATH: reports
 
 jobs:
   #########################################################################
