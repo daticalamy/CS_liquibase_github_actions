@@ -64,7 +64,8 @@ env:
   
   ENVIRONMENT: ${{ inputs.environment }}
   LB_TAG: ${{ github.event.inputs.lb_tag }}
-  LIQUIBASE_REPORTS_PATH: reports
+  LIQUIBASE_REPORT_PATH: s3://asmith-s3-extension-demo/gha_reports
+  LIQUIBASE_LOG_LEVEL: FINE
 
 jobs:
   #########################################################################
@@ -97,15 +98,15 @@ jobs:
 ####################################################################
 #  Artifact creation for Reports
 ####################################################################
-  create-reports-artifact:
-    needs: [database-rollback]
-    runs-on: [self-hosted]
-    environment: ${{ inputs.environment }}
-    if: always()
+  # create-reports-artifact:
+    # needs: [database-rollback]
+    # runs-on: [self-hosted]
+    # environment: ${{ inputs.environment }}
+    # if: always()
 
-    steps:
-      # Save reports as artifact
-      - uses: actions/upload-artifact@v4
-        with:
-          name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
-          path: reports/
+    # steps:
+      # # Save reports as artifact
+      # - uses: actions/upload-artifact@v4
+        # with:
+          # name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
+          # path: reports/
