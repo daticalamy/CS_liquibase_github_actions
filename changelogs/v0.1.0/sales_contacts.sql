@@ -20,3 +20,9 @@ create table Sales.Stores (
   city varchar(30) 
 );
 --rollback DROP TABLE Sales.Stores;
+
+--changeset amy.smith:goals
+create table Sales.Goals (
+  id int, 
+  name varchar(30) 
+);
