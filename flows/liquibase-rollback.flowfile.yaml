@@ -1,0 +1,30 @@
+##########           LIQUIBASE FLOWFILE                ##########
+##########  learn more http://docs.liquibase.com/flow  ##########
+
+globalVariables:
+  ENV: ${ENVIRONMENT}
+  BUCKET: ${AWS_S3_BUCKET}
+
+stages:
+
+  Rollback-SQL:
+    actions:
+      - type: liquibase
+        command: rollback-sql
+        cmdArgs: {tag: "${TAG}"}
+
+  Rollback:
+    actions:
+      - type: liquibase
+        command: rollback
+        cmdArgs: {tag: "${TAG}"}
+        globalArgs: { reports-name: "rollback-report-${ENV}.html" }
+
+## The endStage ALWAYS RUNS. 
+## So put actions here which you desire to perform whether previous stages' actions succeed or fail.
+## If you do not want any actions to ALWAYS RUN, simply delete the endStage from your flow file.
+
+endStage:
+  actions:
+    - type: liquibase
+      command: history
