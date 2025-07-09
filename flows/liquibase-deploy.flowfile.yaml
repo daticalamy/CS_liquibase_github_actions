@@ -5,6 +5,7 @@ globalVariables:
   ENV: ${ENVIRONMENT}
   BUCKET: ${AWS_S3_BUCKET}
   TAG: ${LB_TAG}
+  CHECK_DRIFT: ${LB_CHECK_DRIFT}
 
 stages:
 
@@ -12,6 +13,7 @@ stages:
     # Check if manual updates were made to the environment since last deployment
     actions:
       - type: shell
+        if: "${CHECK_DRIFT} == true"
         command: liquibase --search-path=s3://${BUCKET}/gh_sqlserver_snapshots/ diff --reference-url=offline:mssql?snapshot=${ENV}-snapshot.json --report-name="drift-report-${ENV}.html" --drift-severity=0
           
   Validation:

@@ -74,6 +74,7 @@ env:
   LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
+  LB_CHECK_DRIFT: ${{ github.event.inputs.check_drift }}
 
 jobs:
   #########################################################################
