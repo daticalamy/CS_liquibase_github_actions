@@ -65,7 +65,7 @@ env:
   LIQUIBASE_COMMAND_CHANGELOG_FILE: db.changelog-main.yaml
   
   ENVIRONMENT: ${{ inputs.environment }}
-  LIQUIBASE_COMMAND_TAG: ${{ github.event.inputs.lb_tag || github.run_number }}
+  LB_TAG: ${{ github.event.inputs.lb_tag || github.run_number }}
 
 jobs:
   #########################################################################
