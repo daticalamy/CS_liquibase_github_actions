@@ -12,3 +12,11 @@ create table Sales.Contacts (
 --changeset amy.smith:sales_contacts_idx labels:v0.1.0
 CREATE UNIQUE INDEX name_idx ON Sales.Contacts (name);
 --rollback DROP INDEX name_idx on Sales.Contacts;
+
+--changeset amy.smith:stores
+create table Sales.Stores (
+  id int, 
+  name varchar(30),
+  city varchar(30) 
+);
+--rollback DROP TABLE Sales.Stores;

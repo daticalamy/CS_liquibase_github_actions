@@ -1,28 +1,25 @@
 ####################################################################
-#  GitHub Action to perform a build on the first database, eg. DEV,
-#  using Liquibase Pro, Liquibase Pro Flows,
-#  Custom Quality checks and S3.
+#  GitHub Action to perform an environment-targeted rollback of
+#  database changes using Liquibase Pro, Liquibase Pro Flows, and S3.
 #####################################################################
-name: 'Liquibase Pro Build Job'
-run-name: ${{ inputs.environment}} build of current repo by ${{ github.actor }}
+name: 'Liquibase Pro Rollback'
+run-name: ${{ inputs.environment}} rollback by ${{ github.actor }}
 
 on:
 
   workflow_dispatch:
     # Following are the inputs received via the GitHubActions Run workflow dialog
     inputs:
-    
       # The type 'environment' will automatically pull in the environments created in GitHub
       environment:
-        description: 'Environment for build'
+        description: 'Environment for rollback'
         type: environment
         required: true
-        default: DEV
-        
+
       lb_tag:
-        description: 'Optional tag for the build'
+        description: 'Tag for Rollback'
         type: string
-        required: false
+        required: true     
 
 ####################################################################
 #  Set up the environment
@@ -65,15 +62,15 @@ env:
   LIQUIBASE_COMMAND_CHANGELOG_FILE: db.changelog-main.yaml
   
   ENVIRONMENT: ${{ inputs.environment }}
-  LB_TAG: ${{ github.event.inputs.lb_tag || github.run_number }}
+  LB_TAG: ${{ github.event.inputs.lb_tag }}
   LIQUIBASE_REPORTS_PATH: reports
 
 jobs:
   #########################################################################
-  #  Build
+  #  Rollback
   #########################################################################
 
-  database-build:
+  database-rollback:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
     
@@ -94,13 +91,13 @@ jobs:
     - name: Flows
       uses: liquibase-github-actions/flow@v4.32.0
       with:
-          flowFile: "liquibase-build.flowfile.yaml"
+          flowFile: "liquibase-rollback.flowfile.yaml"
           
 ####################################################################
 #  Artifact creation for Reports
 ####################################################################
   create-reports-artifact:
-    needs: [database-build]
+    needs: [database-rollback]
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
     if: always()
@@ -110,4 +107,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
-          path: reports
+          path: reports/
