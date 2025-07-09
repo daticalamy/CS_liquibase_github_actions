@@ -26,3 +26,4 @@ create table Sales.Goals (
   id int, 
   name varchar(30) 
 );
+--rollback DROP TABLE Sales.Goals;
