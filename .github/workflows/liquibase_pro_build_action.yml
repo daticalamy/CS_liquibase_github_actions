@@ -11,12 +11,18 @@ on:
   workflow_dispatch:
     # Following are the inputs received via the GitHubActions Run workflow dialog
     inputs:
+    
       # The type 'environment' will automatically pull in the environments created in GitHub
       environment:
         description: 'Environment for build'
         type: environment
         required: true
         default: DEV
+        
+      lb_tag:
+        description: 'Optional tag for the build'
+        type: string
+        required: false
 
 ####################################################################
 #  Set up the environment
@@ -59,6 +65,7 @@ env:
   LIQUIBASE_COMMAND_CHANGELOG_FILE: db.changelog-main.yaml
   
   ENVIRONMENT: ${{ inputs.environment }}
+  LIQUIBASE_COMMAND_TAG: ${{ github.event.inputs.lb_tag || github.run_number }}
 
 jobs:
   #########################################################################

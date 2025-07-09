@@ -29,10 +29,15 @@ stages:
       - type: liquibase
         command: update-sql
 
+  Tag:
+    actions:
+      - type: liquibase
+        command: tag
+
   Update:
     actions:
       - type: liquibase
-        command: update
+        command: update-testing-rollback
         globalArgs: { reports-name: "build-report.html" }
 
   Checks-Database:
