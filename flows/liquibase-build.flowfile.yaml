@@ -6,7 +6,6 @@
 ## or your flow file can have multiple stages with fewer actions in each stage.
 globalVariables:
   TAG: ${LB_TAG}
-  BUCKET: ${AWS_S3_BUCKET}
 
 stages:
   Validation:
