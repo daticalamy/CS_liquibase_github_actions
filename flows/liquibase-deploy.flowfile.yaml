@@ -15,7 +15,7 @@ stages:
     actions:
       - type: shell
         if: "${CHECK_DRIFT} == true"
-        command: liquibase --search-path=s3://${BUCKET}/gh_sqlserver_snapshots/ diff --reference-url=offline:mssql?snapshot=${ENV}-snapshot.json --report-name="drift-report-${ENV}.html" --drift-severity=0 --schemas=${SCHEMAS}
+        command: liquibase --search-path=s3://${BUCKET}/gh_sqlserver_snapshots/ diff --reference-url=offline:mssql?snapshot=${ENV}-snapshot.json --report-name="drift-report-${ENV}.html" --drift-severity=1 --schemas=${SCHEMAS}
           
   Validation:
     actions: 
@@ -39,6 +39,12 @@ stages:
     actions:
       - type: liquibase
         command: update-sql
+
+  Tag:
+    actions:
+      - type: liquibase
+        command: tag
+        cmdArgs: {tag: "${TAG}"}
 
   Update:
     actions:
