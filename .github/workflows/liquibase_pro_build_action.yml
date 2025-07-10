@@ -99,12 +99,6 @@ jobs:
       uses: liquibase-github-actions/flow@v4.32.0
       with:
           flowFile: "liquibase-build.flowfile.yaml"
-
-    - name: Reports
-      run: |
-        ls -la
-        cd reports
-        ls -la
           
 ####################################################################
 #  Artifact creation for Reports
