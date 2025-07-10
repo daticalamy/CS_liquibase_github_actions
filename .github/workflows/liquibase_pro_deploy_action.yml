@@ -75,6 +75,7 @@ env:
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
   LB_CHECK_DRIFT: ${{ github.event.inputs.check_drift }}
+  LB_SCHEMAS: "DBO,Sales"
 
 jobs:
   #########################################################################
