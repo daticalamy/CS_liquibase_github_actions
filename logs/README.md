@@ -1,0 +1,1 @@
+# Liquibase log file directory
