@@ -22,7 +22,7 @@ stages:
         if: "${CHECK_DRIFT} == true"
         command: diff
         cmdArgs: { schemas: "${SCHEMAS}", drift-severity: "1", reference-url: "offline:mssql?snapshot=${ENV}-snapshot.json" }
-        globalArgs: { reports-name: "drift-report-${ENV}.html", search-path: "s3://${BUCKET}/gh_sqlserver_snapshots/" }
+        globalArgs: { reports-name: "drift-report-${ENV}.html" }
           
   Validation:
     actions: 
