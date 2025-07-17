@@ -27,3 +27,10 @@ create table Sales.Goals (
   name varchar(30) 
 );
 --rollback DROP TABLE Sales.Goals;
+
+--changeset amy.smith:kpis
+create table Sales.Kpis (
+  id int, 
+  name varchar(30) 
+);
+--rollback DROP TABLE Sales.Kpis;

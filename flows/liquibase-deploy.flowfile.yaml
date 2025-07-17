@@ -6,6 +6,7 @@ globalVariables:
   BUCKET: ${AWS_S3_BUCKET}
   TAG: ${LB_TAG}
   CHECK_DRIFT: ${LB_CHECK_DRIFT}
+  SCHEMAS: ${LB_SCHEMAS}
 
 stages:
 
@@ -14,7 +15,14 @@ stages:
     actions:
       - type: shell
         if: "${CHECK_DRIFT} == true"
-        command: liquibase --search-path=s3://${BUCKET}/gh_sqlserver_snapshots/ diff --reference-url=offline:mssql?snapshot=${ENV}-snapshot.json --report-name="drift-report-${ENV}.html" --drift-severity=0
+        command: liquibase --search-path=s3://${BUCKET}/gh_sqlserver_snapshots/ diff --reference-url=offline:mssql?snapshot=${ENV}-snapshot.json --report-name="drift-report-${ENV}.html" --drift-severity=1 --schemas=${SCHEMAS}
+
+    # actions:
+      # - type: liquibase
+        # if: "${CHECK_DRIFT} == true"
+        # command: diff
+        # cmdArgs: { schemas: "${SCHEMAS}", drift-severity: "1", reference-url: "offline:mssql?snapshot=${ENV}-snapshot.json" }
+        # globalArgs: { reports-name: "drift-report-${ENV}.html" }
           
   Validation:
     actions: 
@@ -39,6 +47,12 @@ stages:
       - type: liquibase
         command: update-sql
 
+  Tag:
+    actions:
+      - type: liquibase
+        command: tag
+        cmdArgs: {tag: "${TAG}"}
+
   Update:
     actions:
       - type: liquibase
@@ -60,7 +74,7 @@ endStage:
   actions:
     - type: liquibase
       command: snapshot
-      cmdArgs: {  snapshot-format: json }
+      cmdArgs: {  snapshot-format: json, schemas: "${SCHEMAS}"}
       globalArgs: { output-file: 's3://${BUCKET}/gh_sqlserver_snapshots/${ENV}-snapshot.json' }
         
     - type: shell
