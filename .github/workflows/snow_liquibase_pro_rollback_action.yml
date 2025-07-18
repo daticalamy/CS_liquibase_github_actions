@@ -95,19 +95,3 @@ jobs:
       uses: liquibase-github-actions/flow@v4.32.0
       with:
           flowFile: "liquibase-rollback.flowfile.yaml"
-          
-####################################################################
-#  Artifact creation for Reports
-####################################################################
-  # create-reports-artifact:
-    # needs: [database-rollback]
-    # runs-on: [self-hosted]
-    # environment: ${{ inputs.environment }}
-    # if: always()
-
-    # steps:
-      # # Save reports as artifact
-      # - uses: actions/upload-artifact@v4
-        # with:
-          # name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
-          # path: reports/
