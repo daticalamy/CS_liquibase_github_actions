@@ -2,7 +2,7 @@
 #  GitHub Action to perform an environment-targeted rollback of
 #  database changes using Liquibase Pro, Liquibase Pro Flows, and S3.
 #####################################################################
-name: 'Liquibase Pro Rollback'
+name: 'Snowflake - Liquibase Pro Rollback'
 run-name: ${{ inputs.environment}} rollback by ${{ github.actor }}
 
 on:
@@ -42,29 +42,29 @@ env:
   
   # JDBC URL of the database per environment
   # See https://docs.liquibase.com/workflows/liquibase-community/using-jdbc-url-in-liquibase.html
-  LIQUIBASE_COMMAND_URL: ${{ secrets.LIQUIBASE_URL }}
+  LIQUIBASE_COMMAND_URL: ${{ secrets.SNOW_LIQUIBASE_URL }}
 
   # Credentials for the environment's database https://docs.liquibase.com/parameters/command-parameters.html
-  LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
-  LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
+  LIQUIBASE_COMMAND_USERNAME: ${{ secrets.SNOW_LIQUIBASE_USERNAME }}
+  LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.SNOW_LIQUIBASE_PASSWORD }}
 
   # Liquibase schema: Specified to allow flexibility in storage of Liquibase Change Tracking Tables
   # See https://docs.liquibase.com/parameters/liquibase-schema-name.html
-  LIQUIBASE_LIQUIBASE_SCHEMA_NAME: LB
+  LIQUIBASE_LIQUIBASE_SCHEMA_NAME: SALES_${{ inputs.environment }}
   
   # Default schema: Specify schema for all changes
-  # LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: Sales
+  LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: SALES_${{ inputs.environment }}
   # LIQUIBASE_COMMAND_REFERENCE_DEFAULT_SCHEMA_NAME: Sales
 
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
   LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
   
   # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
-  LIQUIBASE_COMMAND_CHANGELOG_FILE: db.changelog-main.yaml
+  LIQUIBASE_COMMAND_CHANGELOG_FILE: snowflake.sql
   
   ENVIRONMENT: ${{ inputs.environment }}
   LB_TAG: ${{ github.event.inputs.lb_tag }}
-  LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
+  LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/snow_reports
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
 
@@ -95,19 +95,3 @@ jobs:
       uses: liquibase-github-actions/flow@v4.32.0
       with:
           flowFile: "liquibase-rollback.flowfile.yaml"
-          
-####################################################################
-#  Artifact creation for Reports
-####################################################################
-  # create-reports-artifact:
-    # needs: [database-rollback]
-    # runs-on: [self-hosted]
-    # environment: ${{ inputs.environment }}
-    # if: always()
-
-    # steps:
-      # # Save reports as artifact
-      # - uses: actions/upload-artifact@v4
-        # with:
-          # name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
-          # path: reports/

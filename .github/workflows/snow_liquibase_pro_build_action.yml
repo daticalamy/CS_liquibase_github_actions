@@ -63,13 +63,14 @@ env:
   LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
   
   # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
-  LIQUIBASE_COMMAND_CHANGELOG_FILE: snow.changelog-main.yaml
+  LIQUIBASE_COMMAND_CHANGELOG_FILE: snowflake.sql
   
   ENVIRONMENT: ${{ inputs.environment }}
   LB_TAG: ${{ github.event.inputs.lb_tag || github.run_number }}
 
   LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/snow_reports
   # Values: OFF, SEVERE, WARNING, INFO, FINE
+  # LIQUIBASE_DBCLHISTORY_ENABLED: true
   LIQUIBASE_LOG_LEVEL: INFO
 
 jobs:
