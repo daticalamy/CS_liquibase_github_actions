@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset amy.smith:sales_contacts labels:v0.1.0
+--changeset amy.smith:sales_contacts labels:v0.1.0,JIRA-4562
 CREATE TABLE Contacts (
     id INT PRIMARY KEY,
     name VARCHAR(255),
