@@ -76,7 +76,8 @@ env:
   LIQUIBASE_LOG_LEVEL: INFO
   LB_CHECK_DRIFT: ${{ github.event.inputs.check_drift }}
   LB_SCHEMAS: "SALES_${{ inputs.environment }}"
-  
+  LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_SETTINGS_FILE: snowflake.checks-settings.conf
+
 jobs:
   #########################################################################
   #  Deploy
