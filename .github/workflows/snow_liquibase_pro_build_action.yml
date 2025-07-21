@@ -73,6 +73,7 @@ env:
   # LIQUIBASE_DBCLHISTORY_ENABLED: true
   LIQUIBASE_LOG_LEVEL: INFO
   LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_SETTINGS_FILE: snowflake.checks-settings.conf
+  LIQUIBASE_COMMAND_CHECKS_RUN_CHECK_ROLLBACKS: true
 
 jobs:
   #########################################################################
