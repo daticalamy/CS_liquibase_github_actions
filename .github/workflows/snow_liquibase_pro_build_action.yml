@@ -66,7 +66,7 @@ env:
   LIQUIBASE_COMMAND_CHANGELOG_FILE: snowflake.sql
   
   ENVIRONMENT: ${{ inputs.environment }}
-  LB_TAG: ${{ github.event.inputs.lb_tag || github.run_number }}
+  LB_TAG: ${{ github.event.inputs.lb_tag || github.ref_name }}
 
   LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/snow_reports
   # Values: OFF, SEVERE, WARNING, INFO, FINE
