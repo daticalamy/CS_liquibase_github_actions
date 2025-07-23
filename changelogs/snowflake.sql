@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset amy.smith:sales_contacts labels:v0.1.0,jira-4567
+--changeset amy.smith:sales_contacts labels:v0.1.0
 CREATE TABLE Contacts (
     id INT PRIMARY KEY,
     name VARCHAR(255),
@@ -9,7 +9,7 @@ CREATE TABLE Contacts (
 );
 --rollback DROP TABLE Contacts;
 
---changeset amy.smith:sales_insert_01 labels:v0.1.1,jira-4567
+--changeset amy.smith:sales_insert_01 labels:v0.1.1
 INSERT INTO Contacts (id, name, email) VALUES (1, 'Amy Smith', 'asmith@liquibase.com');
 INSERT INTO Contacts (id, name, email) VALUES (2, 'Ben Riley', 'briley@liquibase.com');
---rollback DELETE FROM Contacts WHERE ID IN (1,2);
+--rollback DELETE FROM Contacts;
