@@ -92,8 +92,10 @@ jobs:
 
     - name: Install Git
       run: |
-        apk update
-        apk add --no-cache git      
+        apt-get update
+        apt-get install -y git
+        apt-get clean
+        rm -rf /var/lib/apt/lists/*  
       
     - name: Install Extensions Using LPM
       run: |
