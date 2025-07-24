@@ -51,8 +51,13 @@ echo "$status_output" | tail -n +2 | while IFS= read -r line; do
     fi
 done
 
-# Check in any Label changes to git
+#################################################
+# Any Changes need to be checked in to git
+#################################################
+
+git remote set-url origin https://x-access-token:$1@github.com/$2
+
 git status
 add add changelogs/*
-git commit -m'Added Liquibase labels to pending changesets'
-git push
+git commit -m'Added Liquibase labels to pending changesets' || echo "Nothing to commit"
+git push origin HEAD:$3

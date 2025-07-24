@@ -104,8 +104,7 @@ jobs:
         
     - name: Set Labels
       run: |
-        ./flows/set_labels.sh
-        
+        ./flows/set_labels.sh ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} ${{ github.ref_name }}      
       
 #    - name: Flows
 #      uses: liquibase-github-actions/flow@v4.32.0
