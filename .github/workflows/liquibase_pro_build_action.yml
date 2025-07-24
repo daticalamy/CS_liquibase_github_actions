@@ -85,8 +85,6 @@ jobs:
     container:
       image: liquibase/liquibase:latest
       options: --user root
-      volumes:
-        - /github/workspace:/github/workspace
       
     steps:
     - name: Checkout code
@@ -103,6 +101,7 @@ jobs:
       run: |
         lpm update
         lpm add liquibase-s3-extension
+      working-directory: ${{ github.workspace }}
 
     - name: Configure Git
       run: |
