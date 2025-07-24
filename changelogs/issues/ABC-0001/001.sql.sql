@@ -11,7 +11,7 @@ create table Sales.Contacts2 (
 
 --changeset amy.smith:sales_contacts_idx labels:v0.1.0
 CREATE UNIQUE INDEX name2_idx ON Sales.Contacts2 (name);
---rollback DROP INDEX name_idx on Sales.Contacts2;
+--rollback DROP INDEX name2_idx on Sales.Contacts2;
 
 --changeset amy.smith:stores
 create table Sales.Stores2 (
