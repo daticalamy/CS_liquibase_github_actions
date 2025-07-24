@@ -85,6 +85,9 @@ jobs:
     container:
       image: liquibase/liquibase:latest
       options: --user root
+      volumes:
+        - /github/workspace:/github/workspace
+      workdir: /github/workspace
       
     steps:
     - name: Checkout code
@@ -113,7 +116,11 @@ jobs:
         git status
         git add add changelogs/*
         git commit -m'Added Liquibase labels to pending changesets' || echo "Nothing to commit"
-        git push origin HEAD:${{ github.ref_name }}         
+        git push origin HEAD:${{ github.ref_name }}
+      env:
+        # Needed if your workflow token doesn’t have push access (e.g., if using fine-grained tokens)
+        # GITHUB_TOKEN is automatically provided for most cases
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
       
 #    - name: Flows
 #      uses: liquibase-github-actions/flow@v4.32.0
