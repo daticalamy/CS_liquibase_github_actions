@@ -101,13 +101,13 @@ jobs:
       run: |
         lpm update
         lpm add liquibase-s3-extension
-      working-directory: ${{ github.workspace }}
+      working-directory: /github/workspace
 
     - name: Configure Git
       run: |
         git config --global user.name "${{ github.actor }}"
         git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-      working-directory: ${{ github.workspace }}
+      working-directory: /github/workspace
         
     - name: Set Labels
       run: |
@@ -115,7 +115,7 @@ jobs:
         git add add changelogs/*
         git commit -m'Added Liquibase labels to pending changesets' || echo "Nothing to commit"
         git push origin HEAD:${{ github.ref_name }}
-      working-directory: ${{ github.workspace }}
+      working-directory: /github/workspace
       env:
         # Needed if your workflow token doesn’t have push access (e.g., if using fine-grained tokens)
         # GITHUB_TOKEN is automatically provided for most cases
