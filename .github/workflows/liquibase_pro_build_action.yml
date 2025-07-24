@@ -112,7 +112,6 @@ jobs:
         
     - name: Set Labels
       run: |
-        ./flows/set_labels.sh
         git status
         git add add changelogs/*
         git commit -m'Added Liquibase labels to pending changesets' || echo "Nothing to commit"
