@@ -55,11 +55,11 @@ done
 # Any Changes need to be checked in to git
 #################################################
 
-echo "Access token: $1"
-echo "GitHub Repo: $2"
-echo "GitHub Ref Name: $3"
+#echo "Access token: $1"
+#echo "GitHub Repo: $2"
+#echo "GitHub Ref Name: $3"
 
-git remote set-url origin https://x-access-token:$1@github.com/$2
+#git remote set-url origin https://x-access-token:$1@github.com/$2
 
 #git status
 #add add changelogs/*

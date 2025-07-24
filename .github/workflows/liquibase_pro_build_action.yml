@@ -101,10 +101,18 @@ jobs:
       run: |
         lpm update
         lpm add liquibase-s3-extension
+
+    - name: Authenticate to GitHub
+      run: |
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         
     - name: Set Labels
       run: |
-        ./flows/set_labels.sh ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} ${{ github.ref_name }}      
+        ./flows/set_labels.sh
+        git status
+        git add add changelogs/*
+        git commit -m'Added Liquibase labels to pending changesets' || echo "Nothing to commit"
+        git push origin HEAD:${{ github.ref_name }}         
       
 #    - name: Flows
 #      uses: liquibase-github-actions/flow@v4.32.0
