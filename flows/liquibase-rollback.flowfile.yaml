@@ -4,6 +4,9 @@
 globalVariables:
   TAG: ${LB_TAG}
   ENV: ${ENVIRONMENT}
+  BUCKET: ${AWS_S3_BUCKET}
+  CHECK_DRIFT: ${LB_CHECK_DRIFT}
+  SCHEMAS: ${LB_SCHEMAS} 
 
 stages:
 
@@ -26,5 +29,13 @@ stages:
 
 endStage:
   actions:
+    - type: liquibase
+      command: snapshot
+      cmdArgs: {  snapshot-format: json, schemas: "${SCHEMAS}"}
+      globalArgs: { output-file: 's3://${BUCKET}/gh_sqlserver_snapshots/${ENV}-snapshot.json' }
+        
+    - type: shell
+      command: echo 'Updated snapshot saved to s3://${BUCKET}/gh_sqlserver_snapshots/${ENV}-snapshot.json'   
+
     - type: liquibase
       command: history

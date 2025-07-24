@@ -94,11 +94,16 @@ jobs:
       run: |
         lpm update
         lpm add liquibase-s3-extension
+        
+    - name: Set Labels
+      run: |
+        ./flows/set_labels.sh
+        
       
-    - name: Flows
-      uses: liquibase-github-actions/flow@v4.32.0
-      with:
-          flowFile: "liquibase-build.flowfile.yaml"
+#    - name: Flows
+#      uses: liquibase-github-actions/flow@v4.32.0
+#      with:
+#          flowFile: "liquibase-build.flowfile.yaml"
           
 ####################################################################
 #  Artifact creation for Reports
