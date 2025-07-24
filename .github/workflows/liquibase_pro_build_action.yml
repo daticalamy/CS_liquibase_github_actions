@@ -102,9 +102,19 @@ jobs:
         lpm update
         lpm add liquibase-s3-extension
 
+    - name: Check Git Status 1
+      run: |
+        cd $GITHUB_WORKSPACE
+        git status
+
     - name: Authenticate to GitHub
       run: |
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+
+    - name: Check Git Status 2
+      run: |
+        cd $GITHUB_WORKSPACE
+        git status
         
     - name: Set Labels
       run: |
