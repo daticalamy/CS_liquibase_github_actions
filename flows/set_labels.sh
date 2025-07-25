@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Run Liquibase status and capture the output
-status_output=$(liquibase status)
+status_output=$(liquibase status --log-level=SEVERE)
 
 # Check if the command ran successfully
 if [ $? -ne 0 ]; then
@@ -44,7 +44,7 @@ echo "$status_output" | tail -n +2 | while IFS= read -r line; do
 	echo "Setting Issue ID Label $issue_id for Filepath: $filepath, ID: $id, Author: $author"
 	
 	# Use the liquibase set-labels command using the values above
-	liquibase set-labels --log-level=INFO --set-as=$issue_id --changeset-author=$author --changeset-id=$id --changeset-path=$filepath
+	liquibase set-labels --log-level=SEVERE --set-as=$issue_id --changeset-author=$author --changeset-id=$id --changeset-path=$filepath
 		
     else
 	echo "Issue ID not found"
