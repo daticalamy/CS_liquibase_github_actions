@@ -89,28 +89,32 @@ jobs:
     steps:
     - name: Create workspace directory
       run: mkdir -p /github/workspace
-    
-    - name: Checkout code
-      uses: actions/checkout@v3
-
+      
     - name: Install Git
       run: |
         apt-get update
         apt-get install -y git
         apt-get clean
-        rm -rf /var/lib/apt/lists/*  
-      
-    - name: Install Extensions Using LPM
-      run: |
-        lpm update
-        lpm add liquibase-s3-extension
-      working-directory: /github/workspace
+        rm -rf /var/lib/apt/lists/*
+        
+    - name: Checkout code
+      uses: actions/checkout@v4  # Updated version
+      with:
+        fetch-depth: 0
+        persist-credentials: true
 
     - name: Configure Git
       run: |
         git config --global user.name "${{ github.actor }}"
         git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-      working-directory: /github/workspace
+        git config --global --add safe.directory ${{ github.workspace }}
+      working-directory: ${{ github.workspace }}
+ 
+    - name: Install Extensions Using LPM
+      run: |
+        lpm update
+        lpm add liquibase-s3-extension
+      working-directory: ${{ github.workspace }}
         
     - name: Set Labels
       run: |
@@ -118,7 +122,7 @@ jobs:
         git add changelogs/*
         git commit -m'Added Liquibase labels to pending changesets' || echo "Nothing to commit"
         git push origin HEAD:${{ github.ref_name }}
-      working-directory: /github/workspace
+      working-directory: ${{ github.workspace }}
       env:
         # Needed if your workflow token doesn’t have push access (e.g., if using fine-grained tokens)
         # GITHUB_TOKEN is automatically provided for most cases
