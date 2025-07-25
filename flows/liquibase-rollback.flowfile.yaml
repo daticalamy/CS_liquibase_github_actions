@@ -10,6 +10,10 @@ globalVariables:
   SCHEMAS: ${LB_SCHEMAS} 
 
 stages:
+  Logging:
+    actions:
+      - type: shell
+        command: echo 'Attempting to rollback using Rollback Type ${ROLLBACK_TYPE} and tag or label ${LB_TAG_OR_LABEL}' 
 
   Rollback-To-Tag-SQL:
     actions:
