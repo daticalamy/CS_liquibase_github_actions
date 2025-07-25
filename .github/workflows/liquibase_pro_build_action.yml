@@ -112,7 +112,8 @@ jobs:
         lpm update
         lpm add liquibase-s3-extension
       working-directory: ${{ github.workspace }}
-        
+    
+    # For set_labels.sh to execute via git, use: git update-index --chmod=+x set_labels.sh      
     - name: Set Liquibase Labels based on folder path
       run: |
         ./flows/set_labels.sh
