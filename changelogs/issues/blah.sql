@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset amy.smith:table_blah 
+--changeset amy.smith:table_blah  labels:no_issue_id_found 
 create table Sales.table_blah (
   id int, 
   name varchar(30)
