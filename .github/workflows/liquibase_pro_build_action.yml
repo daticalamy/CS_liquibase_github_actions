@@ -98,10 +98,10 @@ jobs:
         rm -rf /var/lib/apt/lists/*
         
     - name: Checkout code
-      uses: actions/checkout@v4  # Updated version
-      with:
-        fetch-depth: 0
-        persist-credentials: true
+      uses: actions/checkout@v4
+#      with:
+#        fetch-depth: 0
+#        persist-credentials: true
 
     - name: Configure Git and safe directory
       run: |
@@ -126,10 +126,10 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Auto-generated       
       
-#    - name: Flows
-#      uses: liquibase-github-actions/flow@v4.32.0
-#      with:
-#          flowFile: "liquibase-build.flowfile.yaml"
+    - name: Flows
+      uses: liquibase-github-actions/flow@v4.32.0
+      with:
+          flowFile: "liquibase-build.flowfile.yaml"
           
 ####################################################################
 #  Artifact creation for Reports
