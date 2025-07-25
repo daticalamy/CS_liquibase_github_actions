@@ -87,47 +87,47 @@ jobs:
       options: --user root
       
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
+    - name: Create workspace directory
+      run: mkdir -p /github/workspace
+      
     - name: Install Git
       run: |
         apt-get update
         apt-get install -y git
         apt-get clean
-        rm -rf /var/lib/apt/lists/*  
-      
-    - name: Install Extensions Using LPM
+        rm -rf /var/lib/apt/lists/*
+        
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure Git with safe directory
+      run: |
+        git config --global user.name "${{ github.actor }}"
+        git config --global user.email "${{ github.actor }}@users.noreply.github.com"      
+        git config --global --add safe.directory '*'
+      working-directory: ${{ github.workspace }}
+ 
+    - name: Install Liquibase Extensions Using LPM
       run: |
         lpm update
         lpm add liquibase-s3-extension
-
-    - name: Check Git Status 1
-      run: |
-        cd $GITHUB_WORKSPACE
-        git status
-
-    - name: Authenticate to GitHub
-      run: |
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-
-    - name: Check Git Status 2
-      run: |
-        cd $GITHUB_WORKSPACE
-        git status
-        
-    - name: Set Labels
+      working-directory: ${{ github.workspace }}
+    
+    # For set_labels.sh to execute via git, use: git update-index --chmod=+x set_labels.sh      
+    - name: Set Liquibase Labels based on folder path
       run: |
         ./flows/set_labels.sh
-        git status
-        git add add changelogs/*
+        git add changelogs/*
         git commit -m'Added Liquibase labels to pending changesets' || echo "Nothing to commit"
-        git push origin HEAD:${{ github.ref_name }}         
+        git push origin HEAD:${{ github.ref_name }}
+      working-directory: ${{ github.workspace }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Auto-generated       
       
-#    - name: Flows
-#      uses: liquibase-github-actions/flow@v4.32.0
-#      with:
-#          flowFile: "liquibase-build.flowfile.yaml"
+    - name: Liquibase Flow
+      uses: liquibase-github-actions/flow@v4.32.0
+      with:
+          flowFile: "liquibase-build.flowfile.yaml"
           
 ####################################################################
 #  Artifact creation for Reports

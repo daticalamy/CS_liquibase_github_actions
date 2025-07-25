@@ -1,4 +1,12 @@
 databaseChangeLog:
+  -  changeSet:
+      id:  initial_tag
+      author:  pipeline_onboarding
+      labels:  "no_issue_id_found"
+      changes:
+      -  tagDatabase:
+          tag:  initial_tag
+
   - includeAll:
       path: issues
       relativeToChangelogFile: true   

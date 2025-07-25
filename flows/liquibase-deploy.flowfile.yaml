@@ -51,7 +51,7 @@ stages:
     actions:
       - type: liquibase
         command: tag
-        cmdArgs: {tag: "${TAG}"}
+        cmdArgs: {tag: "${TAG}", add-row: true}
 
   Update:
     actions:
