@@ -115,29 +115,16 @@ jobs:
         lpm update
         lpm add liquibase-s3-extension
       working-directory: ${{ github.workspace }}
-
-    - name: Debug workspace
-      run: |
-        echo "Current directory: $(pwd)"
-        echo "Workspace: ${{ github.workspace }}"
-        echo "Contents of current directory:"
-        ls -la
-        echo "Contents of /github/workspace:"
-        ls -la /github/workspace || echo "/github/workspace doesn't exist"
-        echo "Git status:"
-        git status || echo "Not a git repo"
         
     - name: Set Labels
       run: |
-        git status
+        ./flows/set_labels.sh
         git add changelogs/*
         git commit -m'Added Liquibase labels to pending changesets' || echo "Nothing to commit"
         git push origin HEAD:${{ github.ref_name }}
       working-directory: ${{ github.workspace }}
       env:
-        # Needed if your workflow token doesn’t have push access (e.g., if using fine-grained tokens)
-        # GITHUB_TOKEN is automatically provided for most cases
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}        
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Auto-generated       
       
 #    - name: Flows
 #      uses: liquibase-github-actions/flow@v4.32.0
