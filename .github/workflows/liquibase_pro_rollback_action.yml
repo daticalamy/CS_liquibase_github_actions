@@ -16,8 +16,16 @@ on:
         type: environment
         required: true
 
-      lb_tag:
-        description: 'Tag for Rollback'
+      rollback_type:
+        description: 'Select an option'
+        type: choice
+        required: true
+        options:
+          - rollback_to_tag
+          - rollback_by_label
+
+      lb_tag_or_label:
+        description: 'Tag or Label for Rollback'
         type: string
         required: true     
 
@@ -63,7 +71,9 @@ env:
   LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog.yaml
   
   ENVIRONMENT: ${{ inputs.environment }}
-  LB_TAG: ${{ github.event.inputs.lb_tag }}
+  
+  ROLLBACK_TYPE: ${{ github.event.inputs.rollback_type }}
+  LB_TAG_OR_LABEL: ${{ github.event.inputs.lb_tag_or_label }}
   LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
