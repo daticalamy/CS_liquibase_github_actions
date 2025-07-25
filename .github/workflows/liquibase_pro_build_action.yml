@@ -87,6 +87,9 @@ jobs:
       options: --user root
       
     steps:
+    - name: Create workspace directory
+      run: mkdir -p /github/workspace
+    
     - name: Checkout code
       uses: actions/checkout@v3
 
@@ -112,7 +115,7 @@ jobs:
     - name: Set Labels
       run: |
         git status
-        git add add changelogs/*
+        git add changelogs/*
         git commit -m'Added Liquibase labels to pending changesets' || echo "Nothing to commit"
         git push origin HEAD:${{ github.ref_name }}
       working-directory: /github/workspace
