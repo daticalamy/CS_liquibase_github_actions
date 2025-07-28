@@ -73,6 +73,10 @@ env:
   LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
+  
+  # Prevalidate Settings
+  LB_CLONED_URL: "${{ secrets.LIQUIBASE_CLONED_URL }}"
+  LB_DATABASENAME: "${{ secrets.LIQUIBASE_DATABASE_NAME }}"
 
 jobs:
   #########################################################################
@@ -119,3 +123,4 @@ jobs:
       uses: liquibase-github-actions/flow@v4.32.0
       with:
           flowFile: "liquibase-premerge.flowfile.yaml"
+      working-directory: ${{ github.workspace }} 
