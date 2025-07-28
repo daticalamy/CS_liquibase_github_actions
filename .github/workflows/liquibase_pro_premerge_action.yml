@@ -56,10 +56,6 @@ env:
   # Liquibase schema: Specified to allow flexibility in storage of Liquibase Change Tracking Tables
   # See https://docs.liquibase.com/parameters/liquibase-schema-name.html
   LIQUIBASE_LIQUIBASE_SCHEMA_NAME: LB
-  
-  # Default schema: Specify schema for all changes
-  # LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: Sales
-  # LIQUIBASE_COMMAND_REFERENCE_DEFAULT_SCHEMA_NAME: Sales
 
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
   LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
@@ -129,6 +125,6 @@ jobs:
       with:
           flowFile: "liquibase-premerge.flowfile.yaml"
 
-#    - name: Drop Clone DB
-#      run: |
-#        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "drop database [${LB_DATABASENAME}_eph]"
+    - name: Drop Clone DB
+      run: |
+        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "drop database [${LB_DATABASENAME}_eph]"

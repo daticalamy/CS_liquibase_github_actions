@@ -1,5 +1,4 @@
 globalVariables:
-  # value after :- is the default value
   TAG: ${LB_TAG}
   CLONED_URL: ${LB_CLONED_URL}
   
@@ -17,10 +16,10 @@ stages:
         command: status
         cmdArgs: {verbose: true}
 
-#      - type: control
-#        if: "status.changesetCount == 0"
-#        command: exit
-#        cmdArgs: {exitCode: 0, exitMessage: "Exiting with an error status of 0 because the database is up-to-date"}
+      - type: control
+        if: "status.changesetCount == 0"
+        command: exit
+        cmdArgs: {exitCode: 0, exitMessage: "Exiting with an error status of 0 because the database is up-to-date"}
 
   Checks-Changelog:
     actions:
@@ -50,3 +49,4 @@ endStage:
   actions:
     - type: liquibase
       command: history
+      cmdArgs: { URL: "${CLONED_URL}" }
