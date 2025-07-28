@@ -93,8 +93,8 @@ jobs:
       options: --user root
       
     steps:
-    - name: Create workspace directory
-      run: mkdir -p /github/workspace
+#    - name: Create workspace directory
+#      run: mkdir -p /github/workspace
 
     - name: Checkout code
       uses: actions/checkout@v4
@@ -105,30 +105,21 @@ jobs:
         curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/msprod.list
         apt-get update 
         ACCEPT_EULA=Y apt-get install -y mssql-tools18
-        
-        # Copy to GitHub Workspace
-        mkdir -p /github/workspace/mssql-tools18
-        cp -r /opt/mssql-tools18/* /github/workspace/mssql-tools18/
-        echo "/github/workspace/mssql-tools18/bin" >> $GITHUB_PATH
-        pwd
-        ls
-      working-directory: ${{ github.workspace }}  
+        echo "/opt/mssql-tools18/bin" >> $GITHUB_PATH
+        echo "/github/workspace/mssql-tools18/bin" >> $GITHUB_PATH  
         
     - name: Check Sqlcmd installation
       run: |
         echo "sqlcmd version:"
         sqlcmd -?
-        which sqlcmd
-      working-directory: ${{ github.workspace }} 
+        which sqlcmd 
  
     - name: Install Liquibase Extensions Using LPM
       run: |
         lpm update
-        lpm add liquibase-s3-extension
-      working-directory: ${{ github.workspace }}    
+        lpm add liquibase-s3-extension  
       
     - name: Liquibase Flow
       uses: liquibase-github-actions/flow@v4.32.0
-#      working-directory: ${{ github.workspace }}
       with:
           flowFile: "liquibase-premerge.flowfile.yaml"
