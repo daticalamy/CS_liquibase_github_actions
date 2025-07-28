@@ -121,6 +121,7 @@ jobs:
       run: |
         sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "DBCC clonedatabase([${LB_DATABASENAME}], [${LB_DATABASENAME}_eph]) with verify_clonedb"
         sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "alter database [${LB_DATABASENAME}_eph] set read_write"
+        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "INSERT INTO [${LB_DATABASENAME}_eph].dbo.DATABASECHANGELOG SELECT * FROM ${LB_DATABASENAME}.dbo.DATABASECHANGELOG"
 
     # Run status, checks, etc. 
     - name: Liquibase Flow
