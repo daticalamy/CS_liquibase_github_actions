@@ -35,17 +35,17 @@ stages:
         # command: flow
         # cmdArgs: {flowFile: "clone-sqlserver.yaml"}
       
-      Update SQL
+      #Update SQL
       # - type: liquibase
         # command: updateSQL
         # cmdArgs: { URL: "${CLONED_URL}", USERNAME: "${CLONED_UID}", PASSWORD: "${CLONED_PW}", labels: "${Labels}" }
         
-      Tag the database 
+      #Tag the database 
       # - type: liquibase
         # command: tag
         # cmdArgs: { tag: "${TAG}", URL: "${CLONED_URL}", USERNAME: "${CLONED_UID}", PASSWORD: "${CLONED_PW}" }
 
-      Run the update (with testing rollback)
+      #Run the update (with testing rollback)
       # - type: liquibase
         # command: update-testing-rollback
         # cmdArgs: { URL: "${CLONED_URL}", USERNAME: "${CLONED_UID}", PASSWORD: "${CLONED_PW}", reports-name: "clone-report.html" }       
