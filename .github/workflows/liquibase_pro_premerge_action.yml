@@ -116,6 +116,8 @@ jobs:
     - name: Check Liquibase Status
       uses: liquibase-github-actions/status@v4.32.0
       id: check-liquibase-status
+      with:
+        changeLogFile: "${LIQUIBASE_COMMAND_URL}"
 
     - name: Parse Status Output
       id: parse-status
