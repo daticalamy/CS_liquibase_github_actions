@@ -95,6 +95,9 @@ jobs:
     steps:
     - name: Create workspace directory
       run: mkdir -p /github/workspace
+
+    - name: Checkout code
+      uses: actions/checkout@v4
       
     - name: Install Sqlcmd
       run: |
@@ -107,7 +110,9 @@ jobs:
         mkdir -p /github/workspace/mssql-tools18
         cp -r /opt/mssql-tools18/* /github/workspace/mssql-tools18/
         echo "/github/workspace/mssql-tools18/bin" >> $GITHUB_PATH
-#      working-directory: ${{ github.workspace }}  
+        pwd
+        ls
+      working-directory: ${{ github.workspace }}  
         
     - name: Check Sqlcmd installation
       run: |
@@ -115,9 +120,6 @@ jobs:
         sqlcmd -?
         which sqlcmd
       working-directory: ${{ github.workspace }} 
-        
-    - name: Checkout code
-      uses: actions/checkout@v4
  
     - name: Install Liquibase Extensions Using LPM
       run: |
