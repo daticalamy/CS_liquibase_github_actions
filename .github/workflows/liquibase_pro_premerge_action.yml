@@ -77,6 +77,8 @@ env:
   # Prevalidate Settings
   LB_CLONED_URL: "${{ secrets.LIQUIBASE_CLONED_URL }}"
   LB_DATABASENAME: "${{ secrets.LIQUIBASE_DATABASE_NAME }}"
+  LB_HOSTNAME: "${{ secrets.LIQUIBASE_HOSTNAME }}"
+  LB_PORT: "${{ secrets.LIQUIBASE_PORT }}"
 
 jobs:
   #########################################################################
@@ -93,9 +95,6 @@ jobs:
       options: --user root
       
     steps:
-#    - name: Create workspace directory
-#      run: mkdir -p /github/workspace
-
     - name: Checkout code
       uses: actions/checkout@v4
       
@@ -112,7 +111,6 @@ jobs:
       run: |
         echo "sqlcmd version:"
         sqlcmd -?
-        which sqlcmd 
  
     - name: Install Liquibase Extensions Using LPM
       run: |
@@ -121,10 +119,15 @@ jobs:
 
     - name: Create Clone DB
       run: |
-        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:demo-db1-win.liquibase.net,1433" -C -d "master" -Q "DBCC clonedatabase([${LB_DATABASENAME}], [${LB_DATABASENAME}_eph]) with verify_clonedb"
+        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "DBCC clonedatabase([${LB_DATABASENAME}], [${LB_DATABASENAME}_eph]) with verify_clonedb"
+        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "alter database [${LB_DATABASENAME}_eph] set read_write"
 
     # Run status, checks, etc. 
     - name: Liquibase Flow
       uses: liquibase-github-actions/flow@v4.32.0
       with:
           flowFile: "liquibase-premerge.flowfile.yaml"
+
+#    - name: Drop Clone DB
+#      run: |
+#        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "drop database [${LB_DATABASENAME}_eph]"

@@ -1,6 +1,7 @@
 globalVariables:
   # value after :- is the default value
   TAG: ${LB_TAG}
+  CLONED_URL: ${LB_CLONED_URL}
   
 stages:
 
@@ -21,41 +22,31 @@ stages:
 #        command: exit
 #        cmdArgs: {exitCode: 0, exitMessage: "Exiting with an error status of 0 because the database is up-to-date"}
 
-#  Checks-Changelog:
-#    actions:
-#      - type: liquibase
-#        command: checks run
-#        cmdArgs: {checks-scope: changelog, changeset-filter: "PENDING"}
-#        globalArgs: { reports-name: "checks-report-premerge-changelog.html"}        
-        
-  # Deploy to ephemeral database
-  # Deploy-to-EphemeralDB:
-    # actions:
-      # - type: shell
-        # command: sqlcmd -b  -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:demo-db1-win.liquibase.net,1433"  -d "master" -Q "DBCC clonedatabase([${LB_DATABASENAME}], [${LB_DATABASENAME}_eph]) with verify_clonedb"
-      
-      #Update SQL
-      # - type: liquibase
-        # command: updateSQL
-        # cmdArgs: { URL: "${CLONED_URL}", USERNAME: "${CLONED_UID}", PASSWORD: "${CLONED_PW}", labels: "${Labels}" }
-        
-      #Tag the database 
-      # - type: liquibase
-        # command: tag
-        # cmdArgs: { tag: "${TAG}", URL: "${CLONED_URL}", USERNAME: "${CLONED_UID}", PASSWORD: "${CLONED_PW}" }
+  Checks-Changelog:
+    actions:
+      - type: liquibase
+        command: checks run
+        cmdArgs: {checks-scope: changelog, changeset-filter: "PENDING"}
+        globalArgs: { reports-name: "checks-report-premerge-changelog.html"}
 
-      #Run the update (with testing rollback)
-      # - type: liquibase
-        # command: update-testing-rollback
-        # cmdArgs: { URL: "${CLONED_URL}", USERNAME: "${CLONED_UID}", PASSWORD: "${CLONED_PW}", reports-name: "clone-report.html" }       
+  Update-SQL:
+    actions:
+      - type: liquibase
+        command: update-sql
+
+  # Deploy to ephemeral database
+  Tag-and-Deploy-to-EphemeralDB:
+    actions:
+      - type: liquibase
+        command: tag
+        cmdArgs: { URL: "${CLONED_URL}", tag: "${TAG}" }
+        
+      # Run the update (with testing rollback)
+      - type: liquibase
+        command: update-testing-rollback
+        cmdArgs: { URL: "${CLONED_URL}", reports-name: "clone-report.html" }       
         
 endStage:
   actions:
     - type: liquibase
       command: history
-      
-    # - type: shell
-      # command: sqlcmd -S localhost -U ${CLONED_UID} -P ${CLONED_PW} -v DBNAME=${DATABASENAME} -i clonedbcleanup.sql
-      
-    # - type: shell
-      # command: del "C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER22\MSSQL\Backup\%DATABASENAME%.bak"
