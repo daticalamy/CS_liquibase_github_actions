@@ -93,8 +93,8 @@ jobs:
       options: --user root
       
     steps:
-#    - name: Create workspace directory
-#      run: mkdir -p /github/workspace
+    - name: Create workspace directory
+      run: mkdir -p /github/workspace
       
     - name: Install Sqlcmd
       run: |
@@ -103,13 +103,14 @@ jobs:
         apt-get update 
         ACCEPT_EULA=Y apt-get install -y mssql-tools18
         echo "/opt/mssql-tools18/bin" >> $GITHUB_PATH
+      working-directory: ${{ github.workspace }}  
         
     - name: Check Sqlcmd installation
       run: |
         echo "sqlcmd version:"
         sqlcmd -?
         which sqlcmd
-#      working-directory: ${{ github.workspace }} 
+      working-directory: ${{ github.workspace }} 
         
     - name: Checkout code
       uses: actions/checkout@v4
@@ -118,7 +119,7 @@ jobs:
       run: |
         lpm update
         lpm add liquibase-s3-extension
-#      working-directory: ${{ github.workspace }}    
+      working-directory: ${{ github.workspace }}    
       
     - name: Liquibase Flow
       uses: liquibase-github-actions/flow@v4.32.0
