@@ -32,7 +32,10 @@ stages:
   Deploy-to-EphemeralDB:
     actions:
       - type: shell
-        command: pwd  
+        command: pwd
+
+      - type: shell
+        command: ls          
 
       - type: shell
         command: /github/workspace/mssql-tools18/bin/sqlcmd -b  -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:demo-db1-win.liquibase.net,1433"  -d "master" -Q "DBCC clonedatabase([${LB_DATABASENAME}], [${LB_DATABASENAME}_eph]) with verify_clonedb"

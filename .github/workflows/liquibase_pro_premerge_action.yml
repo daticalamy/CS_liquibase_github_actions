@@ -93,8 +93,8 @@ jobs:
       options: --user root
       
     steps:
-#    - name: Create workspace directory
-#      run: mkdir -p /github/workspace
+    - name: Create workspace directory
+      run: mkdir -p /github/workspace
       
     - name: Install Sqlcmd
       run: |
