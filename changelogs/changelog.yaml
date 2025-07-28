@@ -3,7 +3,7 @@ databaseChangeLog:
       id:  initial_tag_v0
       author:  pipeline_onboarding
       comment: "This tag will be used by the rollback by label functionality."
-      labels:  "initial_tag_v0"
+      labels: "initial_tag_v0,no_issue_id_found"
       changes:
       -  tagDatabase:
           tag:  initial_tag_v0
@@ -12,7 +12,7 @@ databaseChangeLog:
       id:  initial_tag_v1
       author:  pipeline_onboarding
       comment: "This tag will be replaced on the first pipeline run."
-      labels:  "initial_tag_v1"
+      labels: "initial_tag_v1,no_issue_id_found"
       changes:
       -  tagDatabase:
           tag:  initial_tag_v1
