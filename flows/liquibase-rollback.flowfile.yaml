@@ -2,25 +2,47 @@
 ##########  learn more http://docs.liquibase.com/flow  ##########
 
 globalVariables:
-  TAG: ${LB_TAG}
+  ROLLBACK_TYPE: ${ROLLBACK_TYPE}
+  TAG_OR_LABEL: ${LB_TAG_OR_LABEL}
   ENV: ${ENVIRONMENT}
   BUCKET: ${AWS_S3_BUCKET}
   CHECK_DRIFT: ${LB_CHECK_DRIFT}
   SCHEMAS: ${LB_SCHEMAS} 
 
 stages:
+  Rollback-Logging:
+    actions:
+      - type: shell
+        command: echo 'Attempting to rollback using Rollback Type ${ROLLBACK_TYPE} and tag or label ${LB_TAG_OR_LABEL}' 
 
-  Rollback-SQL:
+  Rollback-To-Tag-SQL:
     actions:
       - type: liquibase
+        if: "${ROLLBACK_TYPE} == rollback_to_tag"
         command: rollback-sql
-        cmdArgs: {tag: "${TAG}"}
+        cmdArgs: {tag: "${LB_TAG_OR_LABEL}"}
 
-  Rollback:
+  Rollback-To-Tag:
     actions:
       - type: liquibase
+        if: "${ROLLBACK_TYPE} == rollback_to_tag"
         command: rollback
-        cmdArgs: {tag: "${TAG}"}
+        cmdArgs: {tag: "${LB_TAG_OR_LABEL}"}
+        globalArgs: { reports-name: "rollback-report-${ENV}.html" }
+
+  Rollback-By-Label-SQL:
+    actions:
+      - type: liquibase
+        if: "${ROLLBACK_TYPE} == rollback_by_label"
+        command: rollback-sql
+        cmdArgs: {tag: "initial_tag", label-filter: "${LB_TAG_OR_LABEL}"}
+
+  Rollback-By-Label:
+    actions:
+      - type: liquibase
+        if: "${ROLLBACK_TYPE} == rollback_by_label"
+        command: rollback
+        cmdArgs: {tag: "initial_tag", label-filter: "${LB_TAG_OR_LABEL}"}
         globalArgs: { reports-name: "rollback-report-${ENV}.html" }
 
 ## The endStage ALWAYS RUNS. 

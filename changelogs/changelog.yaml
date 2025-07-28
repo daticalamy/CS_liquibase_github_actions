@@ -1,4 +1,22 @@
 databaseChangeLog:
+  -  changeSet:
+      id:  initial_tag_v0
+      author:  pipeline_onboarding
+      comment: "This tag will be used by the rollback by label functionality."
+      labels:  "initial_tag_v0"
+      changes:
+      -  tagDatabase:
+          tag:  initial_tag_v0
+          
+  -  changeSet:
+      id:  initial_tag_v1
+      author:  pipeline_onboarding
+      comment: "This tag will be replaced on the first pipeline run."
+      labels:  "initial_tag_v1"
+      changes:
+      -  tagDatabase:
+          tag:  initial_tag_v1
+
   - includeAll:
       path: issues
       relativeToChangelogFile: true   

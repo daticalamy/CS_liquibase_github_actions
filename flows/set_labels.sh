@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Run Liquibase status and capture the output
-status_output=$(liquibase status)
+# Run Liquibase status to get pending changesets
+status_output=$(liquibase status --log-level=SEVERE)
 
 # Check if the command ran successfully
 if [ $? -ne 0 ]; then
@@ -9,7 +9,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Check if there are any pending changesets
+# Exit if no pending changesets
 if echo "$status_output" | grep -q "up to date"; then
     echo "Liquibase status returned no pending changesets. Exiting set_labels."
     exit 0
@@ -37,31 +37,24 @@ echo "$status_output" | tail -n +2 | while IFS= read -r line; do
 	
     # Get the issue ID from the filepath. Set the Issue ID as a label for the changeset.	
     if [[ "$filepath" =~ issues/([A-Z]+-[0-9]+)/ ]]; then
-	issue_id="${BASH_REMATCH[1]}"
-	echo "Issue ID: $issue_id"
+		issue_id="${BASH_REMATCH[1]}"
+		echo "Issue ID: $issue_id"
 		
+		# Print the extracted values from the status command
+		echo "Setting Issue ID Label $issue_id for Filepath: $filepath, ID: $id, Author: $author"
+	
+		# Use the liquibase set-labels command using the values above
+		liquibase set-labels --log-level=SEVERE --set-as=$issue_id --changeset-author=$author --changeset-id=$id --changeset-path=$filepath
+		
+    else
+		echo "Issue ID not found. Setting Label to 'No_Issue_Id_Found'"
+		issue_id="No_Issue_Id_Found"
+    fi
+	
 	# Print the extracted values from the status command
 	echo "Setting Issue ID Label $issue_id for Filepath: $filepath, ID: $id, Author: $author"
 	
 	# Use the liquibase set-labels command using the values above
-	liquibase set-labels --set-as=$issue_id --changeset-author=$author --changeset-id=$id --changeset-path=$filepath
-		
-    else
-	echo "Issue ID not found"
-    fi
+	liquibase set-labels --log-level=SEVERE --set-as=$issue_id --changeset-author=$author --changeset-id=$id --changeset-path=$filepath
+	
 done
-
-#################################################
-# Any Changes need to be checked in to git
-#################################################
-
-#echo "Access token: $1"
-#echo "GitHub Repo: $2"
-#echo "GitHub Ref Name: $3"
-
-#git remote set-url origin https://x-access-token:$1@github.com/$2
-
-#git status
-#add add changelogs/*
-#git commit -m'Added Liquibase labels to pending changesets' || echo "Nothing to commit"
-#git push origin HEAD:$3
