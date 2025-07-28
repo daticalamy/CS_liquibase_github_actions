@@ -123,4 +123,3 @@ jobs:
       uses: liquibase-github-actions/flow@v4.32.0
       with:
           flowFile: "liquibase-premerge.flowfile.yaml"
-      working-directory: ${{ github.workspace }} 
