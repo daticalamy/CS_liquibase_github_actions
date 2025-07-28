@@ -117,7 +117,7 @@ jobs:
       uses: liquibase-github-actions/status@v4.32.0
       id: check-liquibase-status
       with:
-        changeLogFile: "${LIQUIBASE_COMMAND_CHANGELOG_FILE}"
+        changeLogFile: "changelog.yaml"
         url: "${{ secrets.LIQUIBASE_URL }}"
 
     - name: Parse Status Output
