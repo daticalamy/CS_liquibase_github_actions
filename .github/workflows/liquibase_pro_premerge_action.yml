@@ -92,12 +92,13 @@ jobs:
     - name: Create workspace directory
       run: mkdir -p /github/workspace
       
-    - name: Install Git
+    - name: Install Sqlcmd
       run: |
-        apt-get update
-        apt-get install -y git
-        apt-get clean
-        rm -rf /var/lib/apt/lists/*
+        curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
+        curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/msprod.list && \
+        apt-get update && \
+        ACCEPT_EULA=Y apt-get install -y mssql-tools18 && \
+        echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
         
     - name: Checkout code
       uses: actions/checkout@v4
