@@ -13,7 +13,7 @@ stages:
       #
       - type: shell
 #        command: sqlcmd -S localhost -U ${CLONED_UID} -P ${CLONED_PW} -v DBNAME=${DATABASE_NAME} -i clonedb.sql
-        command: sqlcmd -b  -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:demo-db1-win.liquibase.net,1433"  -d "master" -Q "DBCC clonedatabase([${DATABASE_NAME}], [${DATABASE_NAME}_eph]) with verify_clonedb"
+        command: /opt/mssql-tools18/bin/sqlcmd -b  -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:demo-db1-win.liquibase.net,1433"  -d "master" -Q "DBCC clonedatabase([${DATABASE_NAME}], [${DATABASE_NAME}_eph]) with verify_clonedb"
         
       ##
       ## If using docker
