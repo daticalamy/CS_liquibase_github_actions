@@ -117,8 +117,13 @@ jobs:
     - name: Install Liquibase Extensions Using LPM
       run: |
         lpm update
-        lpm add liquibase-s3-extension  
-      
+        lpm add liquibase-s3-extension
+
+    - name: Create Clone DB
+      run: |
+        sqlcmd -b  -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:demo-db1-win.liquibase.net,1433"  -d "master" -Q "DBCC clonedatabase([${LB_DATABASENAME}], [${LB_DATABASENAME}_eph]) with verify_clonedb"
+
+    # Run status, checks, etc. 
     - name: Liquibase Flow
       uses: liquibase-github-actions/flow@v4.32.0
       with:

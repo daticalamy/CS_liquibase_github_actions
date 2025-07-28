@@ -29,10 +29,10 @@ stages:
 #        globalArgs: { reports-name: "checks-report-premerge-changelog.html"}        
         
   # Deploy to ephemeral database
-  Deploy-to-EphemeralDB:
-    actions:
-      - type: shell
-        command: sqlcmd -b  -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:demo-db1-win.liquibase.net,1433"  -d "master" -Q "DBCC clonedatabase([${LB_DATABASENAME}], [${LB_DATABASENAME}_eph]) with verify_clonedb"
+  # Deploy-to-EphemeralDB:
+    # actions:
+      # - type: shell
+        # command: sqlcmd -b  -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:demo-db1-win.liquibase.net,1433"  -d "master" -Q "DBCC clonedatabase([${LB_DATABASENAME}], [${LB_DATABASENAME}_eph]) with verify_clonedb"
       
       #Update SQL
       # - type: liquibase
