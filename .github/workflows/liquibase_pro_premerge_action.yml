@@ -1,10 +1,12 @@
 ####################################################################
-#  GitHub Action to perform a build on the first database, eg. DEV,
+#  GitHub Action prior to allowing merge
 #  using Liquibase Pro, Liquibase Pro Flows,
+#  This action spins up a temporary/ephemeral database 
+#  Liquibase changesets and destroys the copy at the end.
 #  Custom Policy checks and S3.
 #####################################################################
-name: 'Liquibase Pro Build Job'
-run-name: ${{ inputs.environment}} build of current repo by ${{ github.actor }}
+name: 'Liquibase Pro Premerge Job'
+run-name: ${{ inputs.environment}} premerge of current repo by ${{ github.actor }}
 
 on:
 
@@ -14,13 +16,13 @@ on:
     
       # The type 'environment' will automatically pull in the environments created in GitHub
       environment:
-        description: 'Environment for build'
+        description: 'Environment for validation'
         type: environment
         required: true
         default: DEV
         
       lb_tag:
-        description: 'Optional tag for the build'
+        description: 'Optional tag for the validation'
         type: string
         required: false
 
@@ -74,10 +76,10 @@ env:
 
 jobs:
   #########################################################################
-  #  Build
+  #  Validation
   #########################################################################
 
-  database-build:
+  database-prevalidation:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
     
@@ -99,48 +101,14 @@ jobs:
         
     - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Configure Git with safe directory
-      run: |
-        git config --global user.name "${{ github.actor }}"
-        git config --global user.email "${{ github.actor }}@users.noreply.github.com"      
-        git config --global --add safe.directory '*'
-      working-directory: ${{ github.workspace }}
  
     - name: Install Liquibase Extensions Using LPM
       run: |
         lpm update
         lpm add liquibase-s3-extension
-      working-directory: ${{ github.workspace }}
-    
-    # For set_labels.sh to execute via git, use: git update-index --chmod=+x set_labels.sh      
-    - name: Set Liquibase Labels based on folder path
-      run: |
-        ./flows/set_labels.sh
-        git add changelogs/*
-        git commit -m'Added Liquibase labels to pending changesets' || echo "Nothing to commit"
-        git push origin HEAD:${{ github.ref_name }}
-      working-directory: ${{ github.workspace }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Auto-generated       
+      working-directory: ${{ github.workspace }}    
       
     - name: Liquibase Flow
       uses: liquibase-github-actions/flow@v4.32.0
       with:
-          flowFile: "liquibase-build.flowfile.yaml"
-          
-####################################################################
-#  Artifact creation for Reports
-####################################################################
-  # create-reports-artifact:
-    # needs: [database-build]
-    # runs-on: [self-hosted]
-    # environment: ${{ inputs.environment }}
-    # if: always()
-
-    # steps:
-      # # Save reports as artifact
-      # - uses: actions/upload-artifact@v4
-        # with:
-          # name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
-          # path: reports
+          flowFile: "liquibase-premerge.flowfile.yaml"

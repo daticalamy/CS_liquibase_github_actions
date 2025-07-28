@@ -1,0 +1,24 @@
+###
+globalVariables:
+  DATABASE_NAME: ${DATABASENAME}
+  DOCKER_IMAGE: server:2022-latest
+  DOCKER_CONTAINER: prevalid-mssqlserver
+
+stages:
+
+  ## The first stage of actions
+  Default:
+    actions:
+      # Clone the database 
+      #
+      - type: shell
+        command: sqlcmd -S localhost -U ${CLONED_UID} -P ${CLONED_PW} -v DBNAME=${DATABASE_NAME} -i clonedb.sql
+        
+      ##
+      ## If using docker
+      ## - type: shell
+      ##   command: docker run --name ${DOCKER_CONTAINER} -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=yourStrong(!)Password" -p 1433:1433 -d mcr.microsoft.com/mssql/${DOCKER_IMAGE}
+      ## - type: shell
+      ##   command: docker cp clonedb.sql ${DOCKER_CONTAINER}:/tmp
+      ## - type: shell
+      ##   command: docker exec -it <container_id|container_name> /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P <yourStrong(!)Password> -v DBNAME=${DATABASE_NAME} -i /tmp/clonedb.sql

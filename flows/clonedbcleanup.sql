@@ -1,0 +1,4 @@
+USE [master];
+GO
+DROP DATABASE [$(DBNAME)_CLONE]
+GO
