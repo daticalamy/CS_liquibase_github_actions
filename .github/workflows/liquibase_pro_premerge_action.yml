@@ -94,11 +94,17 @@ jobs:
       
     - name: Install Sqlcmd
       run: |
-        curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-        curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/msprod.list && \
-        apt-get update && \
-        ACCEPT_EULA=Y apt-get install -y mssql-tools18 && \
-        echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
+        curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+        curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/msprod.list
+        apt-get update 
+        ACCEPT_EULA=Y apt-get install -y mssql-tools18
+        echo "/opt/mssql-tools18/bin" >> $GITHUB_PATH
+        
+    - name: Check Sqlcmd installation
+      run: |
+        echo "sqlcmd version:"
+        sqlcmd -?
+      working-directory: ${{ github.workspace }} 
         
     - name: Checkout code
       uses: actions/checkout@v4
