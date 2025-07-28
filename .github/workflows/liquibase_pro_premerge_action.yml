@@ -108,6 +108,7 @@ jobs:
       run: |
         echo "sqlcmd version:"
         sqlcmd -?
+        which sqlcmd
 #      working-directory: ${{ github.workspace }} 
         
     - name: Checkout code
