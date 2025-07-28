@@ -121,5 +121,6 @@ jobs:
       
     - name: Liquibase Flow
       uses: liquibase-github-actions/flow@v4.32.0
+      working-directory: ${{ github.workspace }}
       with:
           flowFile: "liquibase-premerge.flowfile.yaml"
