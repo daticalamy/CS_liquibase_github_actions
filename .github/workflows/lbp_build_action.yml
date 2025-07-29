@@ -107,7 +107,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Auto-generated
 
     - name: Liquibase Build Flow
-      run: liquibase --flow-file=liquibase-build.flowfile.yaml
+      run: liquibase flow --flow-file=liquibase-build.flowfile.yaml
     
     # container:
       # image: liquibase/liquibase:latest
