@@ -113,12 +113,12 @@ jobs:
         lpm update
         lpm add liquibase-s3-extension
 
-    - name: Check Liquibase Status
-      uses: liquibase-github-actions/status@v4.32.0
+    # Run status 
+    - name: Liquibase Status
       id: check-liquibase-status
+      uses: liquibase-github-actions/flow@v4.32.0
       with:
-        changeLogFile: "changelog.yaml"
-        url: "${{ secrets.LIQUIBASE_URL }}"
+          flowFile: "liquibase-status.flowfile.yaml"
 
     - name: Parse Status Output
       id: parse-status
