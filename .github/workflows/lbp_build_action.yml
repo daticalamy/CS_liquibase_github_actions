@@ -2,7 +2,7 @@
 #  GitHub Action to perform a build on the first database, eg. DEV,
 #  using Liquibase Pro, Flows, Policy checks, and S3.
 ##############################################################################
-name: 'Liquibase Pro Build Job'
+name: 'Liquibase Pro Build Job - New'
 run-name: ${{ inputs.environment}} build of current repo by ${{ github.actor }}
 
 on:
@@ -79,14 +79,14 @@ jobs:
   database-build:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
-    
+
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v1-beta
     - uses: liquibase/setup-liquibase@v1
       with:
         version: '4.32.0'
-        edition: 'oss'
-    - run: liquibase --version    
+        edition: 'pro'
+    - run: liquibase update
     
     # container:
       # image: liquibase/liquibase:latest
