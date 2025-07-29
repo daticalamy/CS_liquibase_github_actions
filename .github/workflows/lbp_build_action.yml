@@ -81,8 +81,8 @@ jobs:
     environment: ${{ inputs.environment }}
 
     steps:
-    - uses: actions/checkout@v1-beta
-    - uses: liquibase/setup-liquibase@v1
+    - uses: actions/checkout@v4
+    - uses: liquibase/setup-liquibase@v1-beta
       with:
         version: '4.32.0'
         edition: 'pro'
