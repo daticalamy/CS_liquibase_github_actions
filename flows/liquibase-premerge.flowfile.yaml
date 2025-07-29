@@ -43,29 +43,7 @@ stages:
       # Run the update (with testing rollback)
       - type: liquibase
         command: update-testing-rollback
-        cmdArgs: { URL: "${CLONED_URL}", reports-name: "clone-report.html" }              
-        
-  # Deploy to ephemeral database
-  # Deploy-to-EphemeralDB:
-    # actions:
-      # - type: liquibase
-        # command: flow
-        # cmdArgs: {flowFile: "clone-sqlserver.yaml"}
-      
-      Update SQL
-      # - type: liquibase
-        # command: updateSQL
-        # cmdArgs: { URL: "${CLONED_URL}", USERNAME: "${CLONED_UID}", PASSWORD: "${CLONED_PW}", labels: "${Labels}" }
-        
-      Tag the database 
-      # - type: liquibase
-        # command: tag
-        # cmdArgs: { tag: "${TAG}", URL: "${CLONED_URL}", USERNAME: "${CLONED_UID}", PASSWORD: "${CLONED_PW}" }
-
-      Run the update (with testing rollback)
-      # - type: liquibase
-        # command: update-testing-rollback
-        # cmdArgs: { URL: "${CLONED_URL}", USERNAME: "${CLONED_UID}", PASSWORD: "${CLONED_PW}", reports-name: "clone-report.html" }       
+        cmdArgs: { URL: "${CLONED_URL}", reports-name: "clone-report.html" }                   
         
 endStage:
   actions:
