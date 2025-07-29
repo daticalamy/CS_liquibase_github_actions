@@ -114,12 +114,9 @@ jobs:
     
     - name: Install Sqlcmd
       run: |
-        sudo mkdir -p /etc/apt/sources.list.d
-        sudo mkdir -p /usr/share/keyrings
-        curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor --batch --yes -o /usr/share/keyrings/microsoft-prod.gpg
-        echo "deb [arch=amd64,arm64,armhf signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://packages.microsoft.com/ubuntu/22.04/prod jammy main" | sudo tee /etc/apt/sources.list.d/msprod.list
-        sudo apt-get update
-        sudo ACCEPT_EULA=Y apt-get install -y mssql-tools18 unixodbc-dev
+        curl https://packages.microsoft.com/config/rhel/8/prod.repo | sudo tee /etc/yum.repos.d/msprod.repo
+        sudo yum update -y
+        sudo ACCEPT_EULA=Y yum install -y mssql-tools18 unixODBC-devel
         echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> $GITHUB_ENV
 
     - name: Check Sqlcmd installation
