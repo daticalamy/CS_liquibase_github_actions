@@ -105,6 +105,13 @@ jobs:
     - name: Liquibase Version        
       run: liquibase --version
 
+    - name: Check OS
+      run: |
+        cat /etc/os-release
+        which apt-get || echo "apt-get not found"
+        which yum || echo "yum not found"
+        which apk || echo "apk not found"
+    
     - name: Install Sqlcmd
       run: |
         sudo mkdir -p /etc/apt/sources.list.d
