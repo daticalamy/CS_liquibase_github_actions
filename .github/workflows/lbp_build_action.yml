@@ -69,7 +69,7 @@ env:
 
   LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
   # Values: OFF, SEVERE, WARNING, INFO, FINE
-  LIQUIBASE_LOG_LEVEL: INFO
+  LIQUIBASE_LOG_LEVEL: FINE
 
 jobs:
   #########################################################################
