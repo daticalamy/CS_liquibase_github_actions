@@ -1,0 +1,129 @@
+####################################################################
+#  GitHub Action prior to allowing merge
+#  using Liquibase Pro, Liquibase Pro Flows,
+#  This action spins up a temporary/ephemeral database 
+#  Liquibase changesets and destroys the copy at the end.
+#  Custom Policy checks and S3.
+#####################################################################
+name: 'Liquibase Pro Premerge Job - New'
+run-name: ${{ inputs.environment}} premerge of current repo by ${{ github.actor }}
+
+on:
+
+  workflow_dispatch:
+    # Following are the inputs received via the GitHubActions Run workflow dialog
+    inputs:
+    
+      # The type 'environment' will automatically pull in the environments created in GitHub
+      environment:
+        description: 'Environment for validation'
+        type: environment
+        required: true
+        default: DEV
+        
+      lb_tag:
+        description: 'Optional tag for the validation'
+        type: string
+        required: false
+
+####################################################################
+#  Set up the environment
+#####################################################################
+env:
+  # AWS S3 bucket is the host part of the S3 bucket
+  # AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+  
+  # AWS Access credentials use by the Liquibase Pro S3 Extension
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+
+  # Default AWS region
+  AWS_REGION: us-east-1
+  
+  # Pro License key
+  # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
+  LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }}
+  
+  # JDBC URL of the database per environment
+  # See https://docs.liquibase.com/workflows/liquibase-community/using-jdbc-url-in-liquibase.html
+  LIQUIBASE_COMMAND_URL: ${{ secrets.LIQUIBASE_URL }}
+
+  # Credentials for the environment's database https://docs.liquibase.com/parameters/command-parameters.html
+  LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
+  LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
+
+  # Liquibase schema: Specified to allow flexibility in storage of Liquibase Change Tracking Tables
+  # See https://docs.liquibase.com/parameters/liquibase-schema-name.html
+  LIQUIBASE_LIQUIBASE_SCHEMA_NAME: LB
+
+  # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
+  LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
+  
+  # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
+  LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog.yaml
+  
+  ENVIRONMENT: ${{ inputs.environment }}
+  LB_TAG: ${{ github.event.inputs.lb_tag || github.run_number }}
+
+  LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
+  # Values: OFF, SEVERE, WARNING, INFO, FINE
+  LIQUIBASE_LOG_LEVEL: INFO
+  
+  # Prevalidate Settings
+  LB_CLONED_URL: "${{ secrets.LIQUIBASE_CLONED_URL }}"
+  LB_DATABASENAME: "${{ secrets.LIQUIBASE_DATABASE_NAME }}"
+  LB_HOSTNAME: "${{ secrets.LIQUIBASE_HOSTNAME }}"
+  LB_PORT: "${{ secrets.LIQUIBASE_PORT }}"
+
+jobs:
+  #########################################################################
+  #  Validation
+  #########################################################################
+
+  database-prevalidation:
+    runs-on: [self-hosted]
+    environment: ${{ inputs.environment }}
+    steps:
+    - uses: actions/checkout@v4
+
+    # Required for self-hosted runners
+    - uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        
+    - uses: liquibase/setup-liquibase@v1-beta
+      with:
+        version: '4.32.0'
+        edition: 'pro'
+
+    - name: Liquibase Version        
+      run: liquibase --version
+     
+    - name: Install Sqlcmd
+      run: |
+        curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+        curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/msprod.list
+        apt-get update 
+        ACCEPT_EULA=Y apt-get install -y mssql-tools18
+        echo "/opt/mssql-tools18/bin" >> $GITHUB_PATH
+        echo "/github/workspace/mssql-tools18/bin" >> $GITHUB_PATH
+
+    - name: Check Sqlcmd installation
+      run: |
+        echo "sqlcmd version:"
+        sqlcmd -?
+        
+    - name: Create Clone DB
+      run: |
+        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "DBCC clonedatabase([${LB_DATABASENAME}], [${LB_DATABASENAME}_eph]) with verify_clonedb"
+        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "alter database [${LB_DATABASENAME}_eph] set read_write"
+        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "INSERT INTO [${LB_DATABASENAME}_eph].${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}.DATABASECHANGELOG SELECT * FROM ${LB_DATABASENAME}.${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}.DATABASECHANGELOG"
+
+    - name: Liquibase Build Flow
+      run: liquibase flow --flow-file=liquibase-premerge.flowfile.yaml
+
+    - name: Drop Clone DB
+      run: |
+        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "drop database [${LB_DATABASENAME}_eph]"
