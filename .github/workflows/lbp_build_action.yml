@@ -92,8 +92,20 @@ jobs:
       with:
         version: '4.32.0'
         edition: 'pro'
-        
-    - run: liquibase --version
+
+    - name: Liquibase Version        
+      run: liquibase --version
+
+    # For set_labels.sh to execute via git, use: git update-index --chmod=+x set_labels.sh      
+    - name: Set Liquibase Labels based on folder path
+      run: |
+        ./flows/set_labels.sh
+        git add changelogs/*
+        git commit -m'Added Liquibase labels to pending changesets' || echo "Nothing to commit"
+        git push origin HEAD:${{ github.ref_name }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Auto-generated
+
     
     # container:
       # image: liquibase/liquibase:latest
