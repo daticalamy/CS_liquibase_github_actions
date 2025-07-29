@@ -1,9 +1,12 @@
-#############################################################################
-#  GitHub Action to perform a build on the first database, eg. DEV,
-#  using Liquibase Pro, Flows, Policy checks, and S3.
-##############################################################################
-name: 'Liquibase Pro Build Job - New'
-run-name: ${{ inputs.environment}} build of current repo by ${{ github.actor }}
+####################################################################
+#  GitHub Action prior to allowing merge
+#  using Liquibase Pro, Liquibase Pro Flows,
+#  This action spins up a temporary/ephemeral database 
+#  Liquibase changesets and destroys the copy at the end.
+#  Custom Policy checks and S3.
+#####################################################################
+name: 'Liquibase Pro Premerge Job - New'
+run-name: ${{ inputs.environment}} premerge of current repo by ${{ github.actor }}
 
 on:
 
@@ -13,13 +16,13 @@ on:
     
       # The type 'environment' will automatically pull in the environments created in GitHub
       environment:
-        description: 'Environment for build'
+        description: 'Environment for validation'
         type: environment
         required: true
         default: DEV
         
       lb_tag:
-        description: 'Optional tag for the build'
+        description: 'Optional tag for the validation'
         type: string
         required: false
 
@@ -53,10 +56,6 @@ env:
   # Liquibase schema: Specified to allow flexibility in storage of Liquibase Change Tracking Tables
   # See https://docs.liquibase.com/parameters/liquibase-schema-name.html
   LIQUIBASE_LIQUIBASE_SCHEMA_NAME: LB
-  
-  # Default schema: Specify schema for all changes
-  # LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: Sales
-  # LIQUIBASE_COMMAND_REFERENCE_DEFAULT_SCHEMA_NAME: Sales
 
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
   LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
@@ -70,24 +69,30 @@ env:
   LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
+  
+  # Prevalidate Settings
+  LB_CLONED_URL: "${{ secrets.LIQUIBASE_CLONED_URL }}"
+  LB_DATABASENAME: "${{ secrets.LIQUIBASE_DATABASE_NAME }}"
+  LB_HOSTNAME: "${{ secrets.LIQUIBASE_HOSTNAME }}"
+  LB_PORT: "${{ secrets.LIQUIBASE_PORT }}"
 
 jobs:
   #########################################################################
-  #  Build
+  #  Validation
   #########################################################################
 
-  database-build:
+  database-prevalidation:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
     steps:
     - uses: actions/checkout@v4
-    
+
     # Required for self-hosted runners
     - uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '17'
-    
+        
     - uses: liquibase/setup-liquibase@v1-beta
       with:
         version: '4.32.0'
@@ -95,16 +100,30 @@ jobs:
 
     - name: Liquibase Version        
       run: liquibase --version
-
-    # For set_labels.sh to execute via git, use: git update-index --chmod=+x set_labels.sh      
-    - name: Set Liquibase Labels based on folder path
+     
+    - name: Install Sqlcmd
       run: |
-        ./flows/set_labels.sh
-        git add changelogs/*
-        git commit -m'Added Liquibase labels to pending changesets' || echo "Nothing to commit"
-        git push origin HEAD:${{ github.ref_name }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Auto-generated
+        curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+        curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/msprod.list
+        apt-get update 
+        ACCEPT_EULA=Y apt-get install -y mssql-tools18
+        echo "/opt/mssql-tools18/bin" >> $GITHUB_PATH
+        echo "/github/workspace/mssql-tools18/bin" >> $GITHUB_PATH
 
-    - name: Liquibase Build Flow
-      run: liquibase flow --flow-file=liquibase-build.flowfile.yaml
+    - name: Check Sqlcmd installation
+      run: |
+        echo "sqlcmd version:"
+        sqlcmd -?
+        
+    - name: Create Clone DB
+      run: |
+        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "DBCC clonedatabase([${LB_DATABASENAME}], [${LB_DATABASENAME}_eph]) with verify_clonedb"
+        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "alter database [${LB_DATABASENAME}_eph] set read_write"
+        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "INSERT INTO [${LB_DATABASENAME}_eph].${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}.DATABASECHANGELOG SELECT * FROM ${LB_DATABASENAME}.${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}.DATABASECHANGELOG"
+
+    - name: Liquibase Premerge Flow
+      run: liquibase flow --flow-file=liquibase-premerge.flowfile.yaml
+
+    - name: Drop Clone DB
+      run: |
+        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "drop database [${LB_DATABASENAME}_eph]"
