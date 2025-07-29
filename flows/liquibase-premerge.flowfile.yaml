@@ -1,6 +1,6 @@
 globalVariables:
-  # value after :- is the default value
   TAG: ${LB_TAG}
+  CLONED_URL: ${LB_CLONED_URL}
   
 stages:
 
@@ -26,7 +26,24 @@ stages:
       - type: liquibase
         command: checks run
         cmdArgs: {checks-scope: changelog, changeset-filter: "PENDING"}
-        globalArgs: { reports-name: "checks-report-premerge-changelog.html"}        
+        globalArgs: { reports-name: "checks-report-premerge-changelog.html"}
+
+  Update-SQL:
+    actions:
+      - type: liquibase
+        command: update-sql
+
+  # Deploy to ephemeral database
+  Tag-and-Deploy-to-EphemeralDB:
+    actions:
+      - type: liquibase
+        command: tag
+        cmdArgs: { URL: "${CLONED_URL}", tag: "${TAG}" }
+        
+      # Run the update (with testing rollback)
+      - type: liquibase
+        command: update-testing-rollback
+        cmdArgs: { URL: "${CLONED_URL}", reports-name: "clone-report.html" }              
         
   # Deploy to ephemeral database
   # Deploy-to-EphemeralDB:
@@ -54,9 +71,4 @@ endStage:
   actions:
     - type: liquibase
       command: history
-      
-    # - type: shell
-      # command: sqlcmd -S localhost -U ${CLONED_UID} -P ${CLONED_PW} -v DBNAME=${DATABASENAME} -i clonedbcleanup.sql
-      
-    # - type: shell
-      # command: del "C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER22\MSSQL\Backup\%DATABASENAME%.bak"
+      cmdArgs: { URL: "${CLONED_URL}" }

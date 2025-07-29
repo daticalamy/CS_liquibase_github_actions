@@ -56,10 +56,6 @@ env:
   # Liquibase schema: Specified to allow flexibility in storage of Liquibase Change Tracking Tables
   # See https://docs.liquibase.com/parameters/liquibase-schema-name.html
   LIQUIBASE_LIQUIBASE_SCHEMA_NAME: LB
-  
-  # Default schema: Specify schema for all changes
-  # LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: Sales
-  # LIQUIBASE_COMMAND_REFERENCE_DEFAULT_SCHEMA_NAME: Sales
 
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
   LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
@@ -73,6 +69,12 @@ env:
   LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
+  
+  # Prevalidate Settings
+  LB_CLONED_URL: "${{ secrets.LIQUIBASE_CLONED_URL }}"
+  LB_DATABASENAME: "${{ secrets.LIQUIBASE_DATABASE_NAME }}"
+  LB_HOSTNAME: "${{ secrets.LIQUIBASE_HOSTNAME }}"
+  LB_PORT: "${{ secrets.LIQUIBASE_PORT }}"
 
 jobs:
   #########################################################################
@@ -89,6 +91,23 @@ jobs:
       options: --user root
       
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install Sqlcmd
+      run: |
+        curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+        curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/msprod.list
+        apt-get update 
+        ACCEPT_EULA=Y apt-get install -y mssql-tools18
+        echo "/opt/mssql-tools18/bin" >> $GITHUB_PATH
+        echo "/github/workspace/mssql-tools18/bin" >> $GITHUB_PATH  
+        
+    - name: Check Sqlcmd installation
+      run: |
+        echo "sqlcmd version:"
+        sqlcmd -?
+
     - name: Create workspace directory
       run: mkdir -p /github/workspace
       
@@ -106,6 +125,41 @@ jobs:
       run: |
         lpm update
         lpm add liquibase-s3-extension
+
+    # Run status 
+    - name: Liquibase Status
+      id: check-liquibase-status
+      uses: liquibase-github-actions/flow@v4.32.0
+      with:
+          flowFile: "liquibase-status.flowfile.yaml"
+
+    - name: Parse Status Output
+      id: parse-status
+      run: |
+        if echo "${{ steps.check-liquibase-status.outputs.stdout }}" | grep -q "database is up-to-date"; then
+          echo "skip-pipeline=true" >> $GITHUB_OUTPUT
+        else
+          echo "skip-pipeline=false" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Create Clone DB
+      if: steps.parse-status.outputs.skip-pipeline == 'false'
+      run: |
+        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "DBCC clonedatabase([${LB_DATABASENAME}], [${LB_DATABASENAME}_eph]) with verify_clonedb"
+        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "alter database [${LB_DATABASENAME}_eph] set read_write"
+        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "INSERT INTO [${LB_DATABASENAME}_eph].${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}.DATABASECHANGELOG SELECT * FROM ${LB_DATABASENAME}.${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}.DATABASECHANGELOG"
+
+    # Run status, checks, etc. 
+    - name: Liquibase Flow
+      if: steps.parse-status.outputs.skip-pipeline == 'false'
+      uses: liquibase-github-actions/flow@v4.32.0
+      with:
+          flowFile: "liquibase-premerge.flowfile.yaml"
+
+    - name: Drop Clone DB
+      if: steps.parse-status.outputs.skip-pipeline == 'false'
+      run: |
+        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "drop database [${LB_DATABASENAME}_eph]"
       working-directory: ${{ github.workspace }}    
       
     - name: Liquibase Flow
