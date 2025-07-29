@@ -93,6 +93,10 @@ jobs:
         version: '4.32.0'
         edition: 'pro'
 
+    - name: Download AWS Extension
+      run: |
+        wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
+
     - name: Liquibase Version        
       run: liquibase --version
 

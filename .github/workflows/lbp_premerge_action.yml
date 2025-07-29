@@ -98,17 +98,21 @@ jobs:
         version: '4.32.0'
         edition: 'pro'
 
+    - name: Download AWS Extension
+      run: |
+        wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
+
     - name: Liquibase Version        
       run: liquibase --version
-     
-    - name: Install Sqlcmd
-      run: |
-        curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-        curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/msprod.list
-        apt-get update 
-        ACCEPT_EULA=Y apt-get install -y mssql-tools18
-        echo "/opt/mssql-tools18/bin" >> $GITHUB_PATH
-        echo "/github/workspace/mssql-tools18/bin" >> $GITHUB_PATH
+
+    # - name: Install Sqlcmd
+      # run: |
+        # curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+        # curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/msprod.list
+        # apt-get update 
+        # ACCEPT_EULA=Y apt-get install -y mssql-tools18
+        # echo "/opt/mssql-tools18/bin" >> $GITHUB_PATH
+        # echo "/github/workspace/mssql-tools18/bin" >> $GITHUB_PATH
 
     - name: Check Sqlcmd installation
       run: |
