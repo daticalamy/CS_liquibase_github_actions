@@ -123,7 +123,7 @@ jobs:
     - name: Parse Status Output
       id: parse-status
       run: |
-        if echo "${{ steps.check-liquibase-status.outputs.stdout }}" | grep -q "is up to date"; then
+        if echo "${{ steps.check-liquibase-status.outputs.stdout }}" | grep -q "database is up-to-date"; then
           echo "skip-pipeline=true" >> $GITHUB_OUTPUT
         else
           echo "skip-pipeline=false" >> $GITHUB_OUTPUT
