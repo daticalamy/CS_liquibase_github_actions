@@ -16,10 +16,10 @@ stages:
         command: status
         cmdArgs: {verbose: true}
 
-      - type: control
-        if: "status.changesetCount == 0"
-        command: exit
-        cmdArgs: {exitCode: 0, exitMessage: "Exiting with an error status of 0 because the database is up-to-date"}
+      # - type: control
+        # if: "status.changesetCount == 0"
+        # command: exit
+        # cmdArgs: {exitCode: 0, exitMessage: "Exiting with an error status of 0 because the database is up-to-date"}
 
   Checks-Changelog:
     actions:
@@ -52,10 +52,14 @@ stages:
       # Run the update (with testing rollback)
       - type: liquibase
         command: update-testing-rollback
-        cmdArgs: { URL: "${CLONED_URL}", reports-name: "clone-report.html" }                   
+        cmdArgs: { URL: "${CLONED_URL}", reports-name: "clone-report.html" }
+
+      - type: liquibase
+        command: history
+        cmdArgs: { URL: "${CLONED_URL}" }        
         
 endStage:
   actions:
-    - type: liquibase
-      command: history
-      cmdArgs: { URL: "${CLONED_URL}" }
+    # - type: liquibase
+      # command: history
+      # cmdArgs: { URL: "${CLONED_URL}" }
