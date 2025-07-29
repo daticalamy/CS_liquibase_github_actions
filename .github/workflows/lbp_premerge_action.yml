@@ -107,6 +107,7 @@ jobs:
 
     - name: Install Sqlcmd
       run: |
+        sudo mkdir -p /usr/share/keyrings
         curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg
         curl -fsSL https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
         sudo apt-get update
