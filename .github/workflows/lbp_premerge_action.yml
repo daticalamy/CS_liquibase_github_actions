@@ -116,9 +116,7 @@ jobs:
       run: |
         curl https://packages.microsoft.com/config/rhel/8/prod.repo | sudo tee /etc/yum.repos.d/msprod.repo
         sudo ACCEPT_EULA=Y yum install -y mssql-tools18 unixODBC-devel
-        echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> $GITHUB_ENV
-        echo "sqlcmd version:"
-        sqlcmd -?
+        echo "/opt/mssql-tools18/bin" >> $GITHUB_PATH
 
     - name: Check Sqlcmd installation
       run: |
