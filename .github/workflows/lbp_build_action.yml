@@ -79,14 +79,21 @@ jobs:
   database-build:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
-
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
+    
+    # Required for self-hosted runners
+    - uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+    
     - uses: liquibase/setup-liquibase@v1-beta
       with:
         version: '4.32.0'
         edition: 'pro'
-    - run: liquibase update
+        
+    - run: liquibase --version
     
     # container:
       # image: liquibase/liquibase:latest
