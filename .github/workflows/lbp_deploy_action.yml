@@ -84,7 +84,6 @@ jobs:
 
   database-deploy:
     runs-on: [self-hosted]
-    environment: ${{ inputs.environment }}
     outputs:
       needs_approval: ${{ steps.lbp-policy-checks.outputs.needs_approval }}
       exit_message: ${{ steps.lbp-policy-checks.outputs.exit_message }}
@@ -117,11 +116,11 @@ jobs:
         if [ $EXIT_CODE -eq 1 ]; then          
           echo "needs_approval=true" >> $GITHUB_OUTPUT
           echo "exit_message=❌ Liquibase checks failed - manual review required" >> $GITHUB_OUTPUT
-          echo "Test msg A"
+          echo "✋ Manual approval will be required"
         else
           echo "needs_approval=false" >> $GITHUB_OUTPUT
           echo "exit_message=✅ Liquibase checks passed" >> $GITHUB_OUTPUT
-          echo "Test msg B"
+          echo "✅ Proceeding automatically"
         fi
         echo "Test msg C"
       
@@ -136,6 +135,9 @@ jobs:
         echo "🚨 Manual approval required!"
         echo "Exit message: ${{ needs.database-deploy.outputs.exit_message }}"
         echo "Click 'Review deployments' to approve or reject this deployment."
+        echo ""
+        echo "To approve: Click 'Review deployments' button above"
+        echo "Environment: ${{ inputs.environment }}"
       
   deploy:
     runs-on: [self-hosted]
