@@ -1,4 +1,8 @@
-### Check whether manual approval is required.
+##########           LIQUIBASE FLOWFILE                ##########
+##########  learn more http://docs.liquibase.com/flow  ##########
+
+globalVariables:
+  ENV: ${ENVIRONMENT}
 
 stages:
   Checks:
