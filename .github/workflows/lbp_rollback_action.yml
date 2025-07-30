@@ -1,26 +1,40 @@
 ####################################################################
-#  GitHub Action prior to allowing merge
-#  using Liquibase Pro, Liquibase Pro Flows,
-#  This action spins up a temporary/ephemeral database 
-#  Liquibase changesets and destroys the copy at the end.
-#  Custom Policy checks and S3.
+#  GitHub Action to perform an environment-targeted rollback of
+#  database changes using Liquibase Pro, Liquibase Pro Flows, and S3.
 #####################################################################
-name: 'Liquibase Pro Premerge Job - New'
-run-name: premerge of current repo by ${{ github.actor }}
+name: 'Liquibase Pro Rollback - New'
+run-name: ${{ inputs.environment}} rollback by ${{ github.actor }}
 
 on:
-  pull_request:
-    branches:
-      - '[A-Z][A-Z][A-Z]-[0-9]*'  # Three uppercase letters, dash, numbers
-      - 'release-[0-9]*.[0-9]*.[0-9]*'  # Semantic versioning pattern
-      - main
 
-##########################################################################
-#  Set up the premerge environment (will be clone of first db, eg. DEV)
-###########################################################################
+  workflow_dispatch:
+    # Following are the inputs received via the GitHubActions Run workflow dialog
+    inputs:
+      # The type 'environment' will automatically pull in the environments created in GitHub
+      environment:
+        description: 'Environment for rollback'
+        type: environment
+        required: true
+
+      rollback_type:
+        description: 'Select an option'
+        type: choice
+        required: true
+        options:
+          - rollback_to_tag
+          - rollback_by_label
+
+      lb_tag_or_label:
+        description: 'Tag or Label for Rollback'
+        type: string
+        required: true     
+
+####################################################################
+#  Set up the environment
+#####################################################################
 env:
   # AWS S3 bucket is the host part of the S3 bucket
-  # AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+  AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
   
   # AWS Access credentials use by the Liquibase Pro S3 Extension
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -45,6 +59,10 @@ env:
   # Liquibase schema: Specified to allow flexibility in storage of Liquibase Change Tracking Tables
   # See https://docs.liquibase.com/parameters/liquibase-schema-name.html
   LIQUIBASE_LIQUIBASE_SCHEMA_NAME: LB
+  
+  # Default schema: Specify schema for all changes
+  # LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: Sales
+  # LIQUIBASE_COMMAND_REFERENCE_DEFAULT_SCHEMA_NAME: Sales
 
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
   LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
@@ -52,56 +70,40 @@ env:
   # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
   LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog.yaml
   
-  ENVIRONMENT: DEV
-  LB_TAG: ${{ github.ref_name }}
-
+  ENVIRONMENT: ${{ inputs.environment }}
+  
+  ROLLBACK_TYPE: ${{ github.event.inputs.rollback_type }}
+  LB_TAG_OR_LABEL: ${{ github.event.inputs.lb_tag_or_label }}
   LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
-  
-  # Prevalidate Settings
-  LB_CLONED_URL: "${{ secrets.LIQUIBASE_CLONED_URL }}"
-  LB_DATABASENAME: "${{ secrets.LIQUIBASE_DATABASE_NAME }}"
-  LB_HOSTNAME: "${{ secrets.LIQUIBASE_HOSTNAME }}"
-  LB_PORT: "${{ secrets.LIQUIBASE_PORT }}"
+  LB_SCHEMAS: "DBO,Sales"
 
 jobs:
   #########################################################################
-  #  Validation
+  #  Rollback
   #########################################################################
 
-  database-prevalidation:
+  database-rollback:
     runs-on: [self-hosted]
-    environment: DEV
+    environment: ${{ inputs.environment }}
     steps:
     - uses: actions/checkout@v4
-
+    
     # Required for self-hosted runners
     - uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '17'
-        
+    
     - uses: liquibase/setup-liquibase@v1-beta
       with:
         version: '4.32.0'
         edition: 'pro'
-
+        
     - name: Download AWS Extension
       run: |
-        wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
-    
-    # Required to run commands for Cloning DB
-    - name: Install Sqlcmd
-      run: |
-        curl https://packages.microsoft.com/config/rhel/8/prod.repo | sudo tee /etc/yum.repos.d/msprod.repo
-        sudo ACCEPT_EULA=Y yum install -y mssql-tools18 unixODBC-devel
-        echo "/opt/mssql-tools18/bin" >> $GITHUB_PATH
-
-    - name: Check Sqlcmd installation
-      run: |
-        echo "sqlcmd version:"
-        sqlcmd -?
-        
-    - name: Liquibase Premerge Flow
-      run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-premerge.flowfile.yaml
+        wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar 
+ 
+    - name: Liquibase Rollback Flow
+      run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-rollback.flowfile.yaml

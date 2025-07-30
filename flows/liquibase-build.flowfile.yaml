@@ -6,7 +6,8 @@
 ## or your flow file can have multiple stages with fewer actions in each stage.
 globalVariables:
   TAG: ${LB_TAG}
-
+  BRANCH: ${BRANCH}
+  
 stages:
   Validation:
     actions: 
@@ -19,10 +20,10 @@ stages:
         command: status
         cmdArgs: {verbose: true}
         
-      # - type: control
-        # if: "status.changesetCount == 0"
-        # command: exit
-        # cmdArgs: {exitCode: 0, exitMessage: "Exiting with an error status of 0 because the database is up-to-date"}
+      - type: control
+        if: "status.changesetCount == 0"
+        command: exit
+        cmdArgs: {exitCode: 0, exitMessage: "Exiting with an error status of 0 because the database is up-to-date"}
 
   Checks-Changelog:
     actions:
@@ -30,6 +31,15 @@ stages:
         command: checks run
         cmdArgs: {checks-scope: changelog, changeset-filter: "PENDING"}
         globalArgs: { reports-name: "checks-report-build-changelog.html"}
+
+  Set-Labels:
+    actions:
+      - type: shell
+        command: |
+          ./flows/set_labels.sh
+          git add changelogs/*
+          git commit -m'Added Liquibase labels to pending changesets' || echo "Nothing to commit"
+          git push origin HEAD:${BRANCH}
 
   Update-SQL:
     actions:
