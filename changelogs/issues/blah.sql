@@ -11,5 +11,6 @@ create table Sales.table_blah (
 create table Sales.table_blah2 (
   id int, 
   name varchar(30),
+  name varchar(30)
 );
 --rollback DROP TABLE Sales.table_blah2;
