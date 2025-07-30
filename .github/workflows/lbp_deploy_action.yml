@@ -85,6 +85,9 @@ jobs:
   database-deploy:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
+    outputs:
+      needs_approval: ${{ steps.lbp-policy-checks.outputs.needs_approval }}
+      exit_message: ${{ steps.lbp-policy-checks.outputs.exit_message }}
     steps:
     - uses: actions/checkout@v4
    
@@ -111,28 +114,31 @@ jobs:
         EXIT_CODE=$?
         set -e
         
-        if [ $EXIT_CODE -eq 1 ]; then
-          echo "❌ Liquibase Checks Failed. Requires Manual Approval."
-          echo "require_approval=true" >> $GITHUB_OUTPUT
-        elif [ $EXIT_CODE -ne 0 ]; then
-          echo "✅ Liquibase Checks Passed. No Approval Required."
-          echo "require_approval=false" >> $GITHUB_OUTPUT
+        if [ $EXIT_CODE -eq 1 ]; then          
+          echo "needs_approval=true" >> $GITHUB_OUTPUT
+          echo "exit_message=❌ Liquibase checks failed - manual review required" >> $GITHUB_OUTPUT
+        else
+          echo "needs_approval=false" >> $GITHUB_OUTPUT
+          echo "exit_message=✅ Liquibase checks passed" >> $GITHUB_OUTPUT
         fi
       
   manual-approval:
     runs-on: [self-hosted]
     needs: database-deploy
     environment: ${{ inputs.environment }}
-    if: needs.database-deploy.outputs.require_approval == 'true'
+    if: needs.database-deploy.outputs.needs_approval == 'true'
     steps:
-    - name: Wait for approval
-      run: echo "Checks Failed. Manual approval required to proceed."
+    - name: Request manual approval
+      run: |
+        echo "🚨 Manual approval required!"
+        echo "Exit message: ${{ needs.database-deploy.outputs.exit_message }}"
+        echo "Click 'Review deployments' to approve or reject this deployment."
       
   deploy:
     runs-on: [self-hosted]
     needs: [database-deploy, manual-approval]
     environment: ${{ inputs.environment }}
-    if: always() && (needs.database-deploy.outputs.require_approval == 'false' || needs.manual-approval.result == 'success')
+    if: always() && (needs.database-deploy.outputs.needs_approval == 'false' || needs.manual-approval.result == 'success')
     steps:
     - uses: actions/checkout@v4    
 
