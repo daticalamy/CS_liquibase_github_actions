@@ -8,7 +8,6 @@ globalVariables:
   TAG: ${LB_TAG}
   BRANCH: ${BRANCH}
   
-
 stages:
   Validation:
     actions: 
