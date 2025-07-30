@@ -9,22 +9,11 @@ name: 'Liquibase Pro Premerge Job - New'
 run-name: ${{ inputs.environment}} premerge of current repo by ${{ github.actor }}
 
 on:
-
-  workflow_dispatch:
-    # Following are the inputs received via the GitHubActions Run workflow dialog
-    inputs:
-    
-      # The type 'environment' will automatically pull in the environments created in GitHub
-      environment:
-        description: 'Environment for validation'
-        type: environment
-        required: true
-        default: DEV
-        
-      lb_tag:
-        description: 'Optional tag for the validation'
-        type: string
-        required: false
+  pull_request:
+    branches:
+      - '[A-Z][A-Z][A-Z]-[0-9]*'  # Three uppercase letters, dash, numbers
+      - 'release-[0-9]*.[0-9]*.[0-9]*'  # Semantic versioning pattern
+      - main
 
 ####################################################################
 #  Set up the environment
@@ -63,8 +52,8 @@ env:
   # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
   LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog.yaml
   
-  ENVIRONMENT: ${{ inputs.environment }}
-  LB_TAG: ${{ github.event.inputs.lb_tag || github.run_number }}
+  ENVIRONMENT: DEV
+  LB_TAG: ${{ github.ref_name }}
 
   LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
   # Values: OFF, SEVERE, WARNING, INFO, FINE
