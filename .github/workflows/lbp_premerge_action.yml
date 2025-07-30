@@ -6,7 +6,7 @@
 #  Custom Policy checks and S3.
 #####################################################################
 name: 'Liquibase Pro Premerge Job - New'
-run-name: ${{ inputs.environment}} premerge of current repo by ${{ github.actor }}
+run-name: premerge of current repo by ${{ github.actor }}
 
 on:
   pull_request:
@@ -15,9 +15,9 @@ on:
       - 'release-[0-9]*.[0-9]*.[0-9]*'  # Semantic versioning pattern
       - main
 
-####################################################################
-#  Set up the environment
-#####################################################################
+##########################################################################
+#  Set up the premerge environment (will be clone of first db, eg. DEV)
+###########################################################################
 env:
   # AWS S3 bucket is the host part of the S3 bucket
   # AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
@@ -72,7 +72,7 @@ jobs:
 
   database-prevalidation:
     runs-on: [self-hosted]
-    environment: ${{ inputs.environment }}
+    environment: DEV
     steps:
     - uses: actions/checkout@v4
 
