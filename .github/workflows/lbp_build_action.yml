@@ -65,6 +65,7 @@ env:
   LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog.yaml
   
   ENVIRONMENT: ${{ inputs.environment }}
+  BRANCH: ${{ github.ref_name }}
   LB_TAG: ${{ github.event.inputs.lb_tag || github.ref_name }}
 
   LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports

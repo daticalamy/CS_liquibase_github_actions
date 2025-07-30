@@ -6,6 +6,7 @@
 ## or your flow file can have multiple stages with fewer actions in each stage.
 globalVariables:
   TAG: ${LB_TAG}
+  BRANCH: ${BRANCH}
   
 
 stages:
@@ -36,10 +37,10 @@ stages:
     actions:
       - type: shell
         command: |
-          .set_labels.sh
+          ./flows/set_labels.sh
           git add changelogs/*
           git commit -m'Added Liquibase labels to pending changesets' || echo "Nothing to commit"
-          git push origin HEAD:${{ github.ref_name }}
+          git push origin HEAD:${BRANCH}
 
   Update-SQL:
     actions:
