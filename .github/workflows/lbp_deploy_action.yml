@@ -128,7 +128,7 @@ jobs:
   manual-approval:
     runs-on: [self-hosted]
     needs: database-deploy
-    environment: ${{ inputs.environment }}
+    environment: manual-approval
     if: needs.database-deploy.outputs.needs_approval == 'true'
     steps:
     - name: Request manual approval
