@@ -101,17 +101,8 @@ jobs:
     - name: Download AWS Extension
       run: |
         wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
-
-    - name: Liquibase Version        
-      run: liquibase --version
-
-    - name: Check OS
-      run: |
-        cat /etc/os-release
-        which apt-get || echo "apt-get not found"
-        which yum || echo "yum not found"
-        which apk || echo "apk not found"
     
+    # Required to run commands for Cloning DB
     - name: Install Sqlcmd
       run: |
         curl https://packages.microsoft.com/config/rhel/8/prod.repo | sudo tee /etc/yum.repos.d/msprod.repo
@@ -123,15 +114,5 @@ jobs:
         echo "sqlcmd version:"
         sqlcmd -?
         
-    # - name: Create Clone DB
-      # run: |
-        # sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "DBCC clonedatabase([${LB_DATABASENAME}], [${LB_DATABASENAME}_eph]) with verify_clonedb"
-        # sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "alter database [${LB_DATABASENAME}_eph] set read_write"
-        # sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "INSERT INTO [${LB_DATABASENAME}_eph].${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}.DATABASECHANGELOG SELECT * FROM ${LB_DATABASENAME}.${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}.DATABASECHANGELOG"
-
     - name: Liquibase Premerge Flow
       run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-premerge.flowfile.yaml
-
-    # - name: Drop Clone DB
-      # run: |
-        # sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "drop database [${LB_DATABASENAME}_eph]"
