@@ -65,7 +65,7 @@ env:
   LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog.yaml
   
   ENVIRONMENT: ${{ inputs.environment }}
-  LB_TAG: ${{ github.event.inputs.lb_tag || github.run_number }}
+  LB_TAG: ${{ github.event.inputs.lb_tag || github.ref_name }}
 
   LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
   # Values: OFF, SEVERE, WARNING, INFO, FINE
@@ -98,14 +98,16 @@ jobs:
         wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
 
     # For set_labels.sh to execute via git, use: git update-index --chmod=+x set_labels.sh      
-    - name: Set Liquibase Labels based on folder path
-      run: |
-        ./flows/set_labels.sh
-        git add changelogs/*
-        git commit -m'Added Liquibase labels to pending changesets' || echo "Nothing to commit"
-        git push origin HEAD:${{ github.ref_name }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Auto-generated
+    # - name: Set Liquibase Labels based on folder path
+      # run: |
+        # ./flows/set_labels.sh
+        # git add changelogs/*
+        # git commit -m'Added Liquibase labels to pending changesets' || echo "Nothing to commit"
+        # git push origin HEAD:${{ github.ref_name }}
+      # env:
+        # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Auto-generated
 
     - name: Liquibase Build Flow
       run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-build.flowfile.yaml
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Auto-generated
