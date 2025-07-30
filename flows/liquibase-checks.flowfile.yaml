@@ -1,11 +1,15 @@
-##########           LIQUIBASE FLOWFILE                ##########
-##########  learn more http://docs.liquibase.com/flow  ##########
-
-globalVariables:
-  ENV: ${ENVIRONMENT}
+### Check whether manual approval is required.
 
 stages:
   Checks:
-    actions:
+    actions:    
       - type: liquibase
-        command: checks show
+        command: checks run
+        cmdArgs: {checks-scope: changelog, changelog-file: "changelogs/changelog.yaml"}
+        globalArgs: { reports-name: "checks-report-test-changelog.html"}
+        continueOnError: true
+        
+      - type: control
+        if: "exitCode >= 2"
+        command: exit
+        cmdArgs: {exitCode: 1, exitMessage: "Exiting with Check Failures. Requires manual approval."}

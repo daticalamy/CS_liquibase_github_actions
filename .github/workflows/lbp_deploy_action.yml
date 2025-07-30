@@ -103,5 +103,28 @@ jobs:
       run: |
         wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
 
+    - name: Liquibase Checks Flow
+      id: lbp-policy-checks
+      run: | 
+        CHECKS_STATUS=$(liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-checks.flowfile.yaml)
+        echo "checks_status=$CHECKS_STATUS" >> $GITHUB_OUTPUT
+      
+  manual-approval:
+    runs-on: [self-hosted]
+    needs: database-deploy
+    environment: ${{ inputs.environment }}
+    if: needs.database-deploy.outputs.checks_status == '1'
+    steps:
+    - name: Wait for approval
+      run: echo "Checks Failed. Manual approval required to proceed."
+      
+  deploy:
+    runs-on: [self-hosted]
+    needs: [check-database, manual-approval]
+    if: always() && (needs.database-deploy.outputs.checks_status == '0' || needs.manual-approval.result == 'success')
+    steps:
+    - name: Deploy
+      run: echo "Proceeding with deployment"
+
     - name: Liquibase Deploy Flow
       run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-deploy.flowfile.yaml
