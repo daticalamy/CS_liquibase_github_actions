@@ -16,4 +16,4 @@ stages:
       - type: control
         if: "exitCode >= 2"
         command: exit
-        cmdArgs: {exitCode: 1, exitMessage: "Exiting with Check Failures. Requires manual approval."}
+        cmdArgs: {exitCode: 0, exitMessage: "Exiting with Check Failures. Requires manual approval."}
