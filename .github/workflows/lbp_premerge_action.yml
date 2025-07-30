@@ -9,22 +9,11 @@ name: 'Liquibase Pro Premerge Job - New'
 run-name: ${{ inputs.environment}} premerge of current repo by ${{ github.actor }}
 
 on:
-
-  workflow_dispatch:
-    # Following are the inputs received via the GitHubActions Run workflow dialog
-    inputs:
-    
-      # The type 'environment' will automatically pull in the environments created in GitHub
-      environment:
-        description: 'Environment for validation'
-        type: environment
-        required: true
-        default: DEV
-        
-      lb_tag:
-        description: 'Optional tag for the validation'
-        type: string
-        required: false
+  pull_request:
+    branches:
+      - '[A-Z][A-Z][A-Z]-[0-9]*'  # Three uppercase letters, dash, numbers
+      - 'release-[0-9]*.[0-9]*.[0-9]*'  # Semantic versioning pattern
+      - main
 
 ####################################################################
 #  Set up the environment
@@ -63,8 +52,8 @@ env:
   # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
   LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog.yaml
   
-  ENVIRONMENT: ${{ inputs.environment }}
-  LB_TAG: ${{ github.event.inputs.lb_tag || github.run_number }}
+  ENVIRONMENT: DEV
+  LB_TAG: ${{ github.ref_name }}
 
   LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
   # Values: OFF, SEVERE, WARNING, INFO, FINE
@@ -98,32 +87,21 @@ jobs:
         version: '4.32.0'
         edition: 'pro'
 
-    - name: Liquibase Version        
-      run: liquibase --version
-     
+    - name: Download AWS Extension
+      run: |
+        wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
+    
+    # Required to run commands for Cloning DB
     - name: Install Sqlcmd
       run: |
-        curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-        curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/msprod.list
-        apt-get update 
-        ACCEPT_EULA=Y apt-get install -y mssql-tools18
+        curl https://packages.microsoft.com/config/rhel/8/prod.repo | sudo tee /etc/yum.repos.d/msprod.repo
+        sudo ACCEPT_EULA=Y yum install -y mssql-tools18 unixODBC-devel
         echo "/opt/mssql-tools18/bin" >> $GITHUB_PATH
-        echo "/github/workspace/mssql-tools18/bin" >> $GITHUB_PATH
 
     - name: Check Sqlcmd installation
       run: |
         echo "sqlcmd version:"
         sqlcmd -?
         
-    - name: Create Clone DB
-      run: |
-        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "DBCC clonedatabase([${LB_DATABASENAME}], [${LB_DATABASENAME}_eph]) with verify_clonedb"
-        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "alter database [${LB_DATABASENAME}_eph] set read_write"
-        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "INSERT INTO [${LB_DATABASENAME}_eph].${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}.DATABASECHANGELOG SELECT * FROM ${LB_DATABASENAME}.${LIQUIBASE_LIQUIBASE_SCHEMA_NAME}.DATABASECHANGELOG"
-
     - name: Liquibase Premerge Flow
-      run: liquibase flow --flow-file=liquibase-premerge.flowfile.yaml
-
-    - name: Drop Clone DB
-      run: |
-        sqlcmd -b -U "${LIQUIBASE_COMMAND_USERNAME}" -P "${LIQUIBASE_COMMAND_PASSWORD}" -S "tcp:${LB_HOSTNAME},${LB_PORT}" -C -d "master" -Q "drop database [${LB_DATABASENAME}_eph]"
+      run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-premerge.flowfile.yaml
