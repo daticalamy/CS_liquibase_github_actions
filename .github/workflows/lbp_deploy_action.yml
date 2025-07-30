@@ -113,17 +113,17 @@ jobs:
         
         if [ $EXIT_CODE -eq 1 ]; then
           echo "❌ Liquibase Checks Failed. Requires Manual Approval."
-          echo "checks_status=1" >> $GITHUB_OUTPUT
+          echo "require_approval=true" >> $GITHUB_OUTPUT
         elif [ $EXIT_CODE -ne 0 ]; then
           echo "✅ Liquibase Checks Passed. No Approval Required."
-          echo "checks_status=0" >> $GITHUB_OUTPUT
+          echo "require_approval=false" >> $GITHUB_OUTPUT
         fi
       
   manual-approval:
     runs-on: [self-hosted]
     needs: database-deploy
     environment: ${{ inputs.environment }}
-    if: needs.database-deploy.outputs.checks_status == '1'
+    if: needs.database-deploy.outputs.require_approval == 'true'
     steps:
     - name: Wait for approval
       run: echo "Checks Failed. Manual approval required to proceed."
@@ -132,7 +132,7 @@ jobs:
     runs-on: [self-hosted]
     needs: [database-deploy, manual-approval]
     environment: ${{ inputs.environment }}
-    if: always() && (needs.database-deploy.outputs.checks_status == '0' || needs.manual-approval.result == 'success')
+    if: always() && (needs.database-deploy.outputs.require_approval == 'false' || needs.manual-approval.result == 'success')
     steps:
     - uses: actions/checkout@v4    
 
