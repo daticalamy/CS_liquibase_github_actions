@@ -15,7 +15,7 @@ stages:
     actions:
       - type: shell
         if: "${CHECK_DRIFT} == true"
-        command: liquibase --search-path=s3://${BUCKET}/gh_sqlserver_snapshots/ diff --reference-url=offline:mssql?snapshot=${ENV}-snapshot.json --report-name="drift-report-${ENV}.html" --reports-enabled=true --drift-severity=1 --schemas=${SCHEMAS}
+        command: liquibase --classpath=liquibase-aws-extension.jar --search-path=s3://${BUCKET}/gh_sqlserver_snapshots/ diff --reference-url=offline:mssql?snapshot=${ENV}-snapshot.json --report-name="drift-report-${ENV}.html" --reports-enabled=true --drift-severity=1 --schemas=${SCHEMAS}
 
     # actions:
       # - type: liquibase
