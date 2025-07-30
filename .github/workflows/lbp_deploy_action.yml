@@ -117,10 +117,13 @@ jobs:
         if [ $EXIT_CODE -eq 1 ]; then          
           echo "needs_approval=true" >> $GITHUB_OUTPUT
           echo "exit_message=❌ Liquibase checks failed - manual review required" >> $GITHUB_OUTPUT
+          echo "Test msg A"
         else
           echo "needs_approval=false" >> $GITHUB_OUTPUT
           echo "exit_message=✅ Liquibase checks passed" >> $GITHUB_OUTPUT
+          echo "Test msg B"
         fi
+        echo "Test msg C"
       
   manual-approval:
     runs-on: [self-hosted]
