@@ -123,8 +123,22 @@ jobs:
     needs: [database-deploy, manual-approval]
     if: always() && (needs.database-deploy.outputs.checks_status == '0' || needs.manual-approval.result == 'success')
     steps:
-    - name: Deploy
-      run: echo "Proceeding with deployment"
+    - uses: actions/checkout@v4    
+
+    # Required for self-hosted runners
+    - uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - uses: liquibase/setup-liquibase@v1-beta
+      with:
+        version: '4.32.0'
+        edition: 'pro'
+
+    - name: Download AWS Extension
+      run: |
+        wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
 
     - name: Liquibase Deploy Flow
       run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-deploy.flowfile.yaml
