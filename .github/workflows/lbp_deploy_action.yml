@@ -120,7 +120,7 @@ jobs:
       
   deploy:
     runs-on: [self-hosted]
-    needs: [check-database, manual-approval]
+    needs: [database-deploy, manual-approval]
     if: always() && (needs.database-deploy.outputs.checks_status == '0' || needs.manual-approval.result == 'success')
     steps:
     - name: Deploy
