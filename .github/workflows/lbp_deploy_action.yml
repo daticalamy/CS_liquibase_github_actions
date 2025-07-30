@@ -121,6 +121,7 @@ jobs:
   deploy:
     runs-on: [self-hosted]
     needs: [database-deploy, manual-approval]
+    environment: ${{ inputs.environment }}
     if: always() && (needs.database-deploy.outputs.checks_status == '0' || needs.manual-approval.result == 'success')
     steps:
     - uses: actions/checkout@v4    
