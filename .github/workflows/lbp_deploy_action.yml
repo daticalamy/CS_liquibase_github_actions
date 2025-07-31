@@ -84,6 +84,7 @@ jobs:
 
   database-deploy:
     runs-on: [self-hosted]
+    environment: ${{ inputs.environment }}
     outputs:
       needs_approval: ${{ steps.lbp-policy-checks.outputs.needs_approval }}
       exit_message: ${{ steps.lbp-policy-checks.outputs.exit_message }}
