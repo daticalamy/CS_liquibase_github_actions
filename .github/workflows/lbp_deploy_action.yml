@@ -108,7 +108,7 @@ jobs:
     - name: Liquibase Checks Flow
       id: lbp-policy-checks
       run: | 
-        liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-checks.flowfile.yaml
+        liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-checks.flowfile.yaml --url=${{ secrets.LIQUIBASE_URL }}
       
         set +e
         CHECKS_STATUS=$(liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-checks.flowfile.yaml 2>&1)
