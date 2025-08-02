@@ -19,5 +19,6 @@ databaseChangeLog:
 
   - includeAll:
       path: issues
-      relativeToChangelogFile: true   
+      relativeToChangelogFile: true
+      errorIfMissingOrEmpty: false      
       
