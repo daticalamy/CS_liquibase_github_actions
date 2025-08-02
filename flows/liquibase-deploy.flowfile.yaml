@@ -15,7 +15,7 @@ stages:
     actions:
       - type: shell
         if: "${CHECK_DRIFT} == true"
-        command: liquibase --classpath=liquibase-aws-extension.jar --search-path=s3://${BUCKET}/gh_sqlserver_snapshots/ diff --reference-url=offline:mssql?snapshot=${ENV}-snapshot.json --report-name="drift-report-${ENV}.html" --reports-enabled=true --drift-severity=1 --schemas=${SCHEMAS}
+        command: liquibase --classpath=liquibase-aws-extension.jar --search-path=s3://${BUCKET}/gh_sqlserver_snapshots/ diff --reference-url=offline:mssql?snapshot=${ENV}-snapshot.json --report-name="drift-report-${ENV}.html" --reports-enabled=true --drift-severity=1 --schemas=${SCHEMAS} --diff-types=columns,foreignkeys,indexes,primarykeys,tables,uniqueconstraints,views,checkconstraints,triggers
 
     # actions:
       # - type: liquibase
@@ -79,7 +79,7 @@ endStage:
   actions:
     - type: liquibase
       command: snapshot
-      cmdArgs: {  snapshot-format: json, schemas: "${SCHEMAS}", snapshot-filters: "catalog,checkConstraint,column,foreignKey,index,primaryKey,schema,sequence,table,trigger,uniqueConstraint,view"}
+      cmdArgs: {  snapshot-format: json, schemas: "${SCHEMAS}", snapshot-filters: "column,foreignkey,index,primarykey,table,uniqueconstraint,view,checkconstraint,trigger"}
       globalArgs: { output-file: 's3://${BUCKET}/gh_sqlserver_snapshots/${ENV}-snapshot.json' }
         
     - type: shell
