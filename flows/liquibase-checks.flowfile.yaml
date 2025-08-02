@@ -6,6 +6,14 @@ globalVariables:
 
 stages:
   Checks:
-    actions:
+    actions:    
       - type: liquibase
-        command: checks show
+        command: checks run
+        cmdArgs: {checks-scope: changelog, changeset-filter: "PENDING"}
+        globalArgs: { reports-name: "checks-report-deploy-${ENV}-changelog.html"}
+        continueOnError: true
+        
+      - type: control
+        if: "exitCode >= 2"
+        command: exit
+        cmdArgs: {exitCode: 1, exitMessage: "Exiting with Check Failures. Requires manual approval."}

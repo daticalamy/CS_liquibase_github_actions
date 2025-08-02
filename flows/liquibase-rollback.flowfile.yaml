@@ -53,7 +53,7 @@ endStage:
   actions:
     - type: liquibase
       command: snapshot
-      cmdArgs: {  snapshot-format: json, schemas: "${SCHEMAS}"}
+      cmdArgs: {  snapshot-format: json, schemas: "${SCHEMAS}", snapshot-filters: "column,foreignkey,index,primarykey,table,uniqueconstraint,view,checkconstraint,trigger"}}
       globalArgs: { output-file: 's3://${BUCKET}/gh_sqlserver_snapshots/${ENV}-snapshot.json' }
         
     - type: shell

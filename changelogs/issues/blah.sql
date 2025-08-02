@@ -13,3 +13,7 @@ create table Sales.table_blah2 (
   name varchar(30)
 );
 --rollback DROP TABLE Sales.table_blah2;
+
+--changeset amy.smith:table_blah2_delete 
+delete from Sales.table_blah2;
+--rollback select '1';

@@ -15,7 +15,7 @@ stages:
     actions:
       - type: shell
         if: "${CHECK_DRIFT} == true"
-        command: liquibase --classpath=liquibase-aws-extension.jar --search-path=s3://${BUCKET}/gh_sqlserver_snapshots/ diff --reference-url=offline:mssql?snapshot=${ENV}-snapshot.json --report-name="drift-report-${ENV}.html" --reports-enabled=true --drift-severity=1 --schemas=${SCHEMAS}
+        command: liquibase --classpath=liquibase-aws-extension.jar --search-path=s3://${BUCKET}/gh_sqlserver_snapshots/ diff --reference-url=offline:mssql?snapshot=${ENV}-snapshot.json --report-name="drift-report-${ENV}.html" --reports-enabled=true --drift-severity=1 --schemas=${SCHEMAS} --diff-types=columns,foreignkeys,indexes,primarykeys,tables,uniqueconstraints,views,checkconstraints,triggers
 
     # actions:
       # - type: liquibase
@@ -40,12 +40,12 @@ stages:
         command: exit
         cmdArgs: {exitCode: 0, exitMessage: "Exiting with an error status of 0 because the database is up-to-date"}
 
-  Checks-Changelog:
-    actions:
-      - type: liquibase
-        command: checks run
-        cmdArgs: {checks-scope: changelog, changeset-filter: "PENDING"}
-        globalArgs: { reports-name: "checks-report-deploy-${ENV}-changelog.html" }
+  # Checks-Changelog:
+    # actions:
+      # - type: liquibase
+        # command: checks run
+        # cmdArgs: {checks-scope: changelog, changeset-filter: "PENDING"}
+        # globalArgs: { reports-name: "checks-report-deploy-${ENV}-changelog.html" }
 
   Update-SQL:
     actions:
@@ -79,7 +79,7 @@ endStage:
   actions:
     - type: liquibase
       command: snapshot
-      cmdArgs: {  snapshot-format: json, schemas: "${SCHEMAS}"}
+      cmdArgs: {  snapshot-format: json, schemas: "${SCHEMAS}", snapshot-filters: "column,foreignkey,index,primarykey,table,uniqueconstraint,view,checkconstraint,trigger"}
       globalArgs: { output-file: 's3://${BUCKET}/gh_sqlserver_snapshots/${ENV}-snapshot.json' }
         
     - type: shell
