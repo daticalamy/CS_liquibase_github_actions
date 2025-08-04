@@ -9,7 +9,7 @@ create table Sales.Contacts2 (
 --rollback DROP TABLE Sales.Contacts2;
 
 
---changeset amy.smith:sales_contacts labels:abc-0001 _idx
+--changeset amy.smith:sales_contacts_idx labels:abc-0001
 CREATE UNIQUE INDEX name2_idx ON Sales.Contacts2 (name);
 --rollback DROP INDEX name2_idx on Sales.Contacts2;
 
