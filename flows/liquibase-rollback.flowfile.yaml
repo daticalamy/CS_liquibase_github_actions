@@ -35,7 +35,7 @@ stages:
       - type: liquibase
         if: "${ROLLBACK_TYPE} == rollback_by_label"
         command: rollback-sql
-        cmdArgs: {tag: "initial_tag", label-filter: "${LB_TAG_OR_LABEL}"}
+        cmdArgs: {tag: "initial_tag_v0", label-filter: "${LB_TAG_OR_LABEL}"}
 
   Rollback-By-Label:
     actions:
