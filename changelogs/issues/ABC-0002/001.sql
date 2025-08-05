@@ -24,7 +24,7 @@ create table Sales.Contacts7 (
 );
 --rollback DROP TABLE Sales.Contacts7;
 
---changeset amy.smith:sales_contacts8
+--changeset amy.smith:sales_contacts8 labels:abc-0002 
 create table Sales.Contacts8 (
   id int, 
   name varchar(30),
