@@ -23,3 +23,11 @@ create table Sales.Contacts7 (
   dept varchar(30) 
 );
 --rollback DROP TABLE Sales.Contacts7;
+
+--changeset amy.smith:sales_contacts8
+create table Sales.Contacts8 (
+  id int, 
+  name varchar(30),
+  dept varchar(30) 
+);
+--rollback DROP TABLE Sales.Contacts8;
