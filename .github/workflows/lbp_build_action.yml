@@ -28,7 +28,7 @@ on:
 #####################################################################
 env:
   # AWS S3 bucket is the host part of the S3 bucket
-  # AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+  AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
   
   # AWS Access credentials use by the Liquibase Pro S3 Extension
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -68,7 +68,8 @@ env:
   BRANCH: ${{ github.ref_name }}
   LB_TAG: ${{ github.event.inputs.lb_tag || github.ref_name }}
 
-  LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
+  # LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
+  LIQUIBASE_REPORT_PATH: reports
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
 
@@ -102,3 +103,41 @@ jobs:
       run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-build.flowfile.yaml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Auto-generated
+
+####################################################################
+#  Artifact creation for Reports
+####################################################################
+  create-reports-artifact:
+    needs: [database-build]
+    runs-on: [self-hosted]
+    environment: ${{ inputs.environment }}
+    if: always()
+
+    steps:
+      # Save reports as artifact
+      - uses: actions/upload-artifact@v4
+        with:
+          name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
+          path: reports
+
+      # Also zip reports for S3
+      - name: Create zip file for S3
+        run: |
+          zip -r REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip reports/
+          pwd
+
+      # Configure AWS credentials for S3 upload
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Upload to S3
+      - name: Upload reports to S3
+        run: |
+          aws s3 cp REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip \
+            s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports/${{ inputs.environment }}/ \
+            --metadata "run-id=${{ github.run_id }},run-number=${{ github.run_number }},environment=${{ inputs.environment }}"
