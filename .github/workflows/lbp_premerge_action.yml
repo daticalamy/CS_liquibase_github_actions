@@ -60,7 +60,7 @@ env:
   LIQUIBASE_LOG_LEVEL: INFO
   
   # Prevalidate Settings
-  LB_CLONED_URL: "${{ secrets.LIQUIBASE_CLONED_URL }}"
+  LB_CLONED_URL: "jdbc:sqlserver://${{ secrets.LIQUIBASE_HOSTNAME }}:${{ secrets.LIQUIBASE_PORT }};databaseName=${{ secrets.LIQUIBASE_DATABASE_NAME }}_eph;trustServerCertificate=true"
   LB_DATABASENAME: "${{ secrets.LIQUIBASE_DATABASE_NAME }}"
   LB_HOSTNAME: "${{ secrets.LIQUIBASE_HOSTNAME }}"
   LB_PORT: "${{ secrets.LIQUIBASE_PORT }}"

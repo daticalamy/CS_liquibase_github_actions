@@ -119,3 +119,19 @@ jobs:
         with:
           name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
           path: reports
+
+      # Also zip reports for S3
+      - name: Create zip file for S3
+        run: |
+          zip -r REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip reports/      
+
+      # Send to S3
+      - name: Send to S3
+        uses: jakejarvis/s3-sync-action@master
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          AWS_REGION: 'us-east-1'
+          SOURCE_DIR: 'REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip'
