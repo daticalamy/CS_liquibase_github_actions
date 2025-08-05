@@ -15,3 +15,11 @@ create table Sales.Contacts6 (
   dept varchar(30) 
 );
 --rollback DROP TABLE Sales.Contacts6;
+
+--changeset amy.smith:sales_contacts7 labels:abc-0002 
+create table Sales.Contacts7 (
+  id int, 
+  name varchar(30),
+  dept varchar(30) 
+);
+--rollback DROP TABLE Sales.Contacts7;

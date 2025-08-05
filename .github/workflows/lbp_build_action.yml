@@ -123,7 +123,8 @@ jobs:
       # Also zip reports for S3
       - name: Create zip file for S3
         run: |
-          zip -r REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip reports/      
+          zip -r REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip reports/
+          pwd          
 
       # Send to S3
       - name: Send to S3
