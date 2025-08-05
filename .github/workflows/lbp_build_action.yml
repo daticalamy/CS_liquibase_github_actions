@@ -68,7 +68,8 @@ env:
   BRANCH: ${{ github.ref_name }}
   LB_TAG: ${{ github.event.inputs.lb_tag || github.ref_name }}
 
-  LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
+  # LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
+  LIQUIBASE_REPORT_PATH: reports
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
 
@@ -102,3 +103,19 @@ jobs:
       run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-build.flowfile.yaml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Auto-generated
+
+####################################################################
+#  Artifact creation for Reports
+####################################################################
+  create-reports-artifact:
+    needs: [build]
+    runs-on: [self-hosted]
+    environment: ${{ inputs.environment }}
+    if: always()
+
+    steps:
+      # Save reports as artifact
+      - uses: actions/upload-artifact@v4
+        with:
+          name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
+          path: reports
