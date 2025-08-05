@@ -108,7 +108,7 @@ jobs:
 #  Artifact creation for Reports
 ####################################################################
   create-reports-artifact:
-    needs: [build]
+    needs: [database-build]
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
     if: always()
