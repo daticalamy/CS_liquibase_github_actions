@@ -1,0 +1,56 @@
+# .github/workflows/upload-reports/action.yml
+name: 'Upload Reports Artifact'
+description: 'Creates artifact for reports and optionally uploads to S3'
+
+inputs:
+  job-type:
+    description: 'Type of job (checks or deploy)'
+    required: true
+  upload-s3:
+    description: 'Whether to upload to S3'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set timestamp
+      shell: bash
+      run: echo "TIMESTAMP=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+
+    - name: Upload GitHub Artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: REPORTS-${{ inputs.job-type }}-${{ env.TIMESTAMP }}-${{ github.run_id }}.${{ github.run_number }}.zip
+        path: reports
+
+    - name: Create zip file for S3
+      if: inputs.upload-s3 == 'true'
+      id: create_zip
+      shell: bash
+      run: |
+        if [ -d "reports" ] && [ "$(ls -A reports)" ]; then
+          zip -r REPORTS-${{ env.TIMESTAMP }}-${{ github.run_id }}.${{ github.run_number }}.zip reports/
+          echo "zip_created=true" >> $GITHUB_OUTPUT
+          echo "Reports zipped successfully"
+        else
+          echo "zip_created=false" >> $GITHUB_OUTPUT
+          echo "No reports directory found or directory is empty - skipping zip creation"
+        fi
+
+    - name: Configure AWS credentials
+      if: inputs.upload-s3 == 'true' && steps.create_zip.outputs.zip_created == 'true'
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Upload reports to S3
+      if: inputs.upload-s3 == 'true' && steps.create_zip.outputs.zip_created == 'true'
+      shell: bash
+      run: |
+        aws s3 cp REPORTS-${{ env.TIMESTAMP }}-${{ github.run_id }}.${{ github.run_number }}.zip \
+          s3://${{ env.AWS_S3_BUCKET }}/reports/${{ env.ENVIRONMENT }}/ \
+          --metadata "run-id=${{ github.run_id }},run-number=${{ github.run_number }},environment=${{ env.ENVIRONMENT }}"
