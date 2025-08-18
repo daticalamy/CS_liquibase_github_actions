@@ -92,6 +92,27 @@ jobs:
     # Required to run commands for Cloning DB
     - name: Install MSSQL Client tools
       uses: ./.github/workflows/install-mssql-client-tools
+
+    - name: Liquibase Checks Flow
+      id: lbp-policy-checks
+      continue-on-error: true
+      run: | 
+        set +e
+        CHECKS_STATUS=$(liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-checks.flowfile.yaml 2>&1)
+        EXIT_CODE=$?
+        set -e
+        if [ $EXIT_CODE -eq 1 ]; then
+          echo "::error::Policy checks did not pass, but allowing merge."
+          echo "::error::In non-build environments, this deployment will require Manual Approval."
+          exit $EXIT_CODE
+        fi
         
     - name: Liquibase Premerge Flow
       run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-premerge.flowfile.yaml
+
+    - name: Upload Reports Artifact
+      if: always()
+      uses: ./.github/workflows/upload-reports
+      with:
+        job-type: deploy
+        upload-s3: true
