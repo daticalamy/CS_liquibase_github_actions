@@ -6,11 +6,9 @@ name: 'Liquibase Pro Build Job'
 run-name: ${{ inputs.environment}} build of current repo by ${{ github.actor }}
 
 on:
-
   workflow_dispatch:
     # Following are the inputs received via the GitHubActions Run workflow dialog
     inputs:
-    
       # The type 'environment' will automatically pull in the environments created in GitHub
       environment:
         description: 'Environment for build'
