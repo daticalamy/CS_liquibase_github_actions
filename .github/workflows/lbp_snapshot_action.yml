@@ -1,12 +1,11 @@
 ####################################################################
-#  GitHub Action to perform an environment-targeted rollback of
-#  database changes using Liquibase Pro, Liquibase Pro Flows, and S3.
+#  GitHub Action to perform an environment-targeted snapshot of
+#  a database using Liquibase Pro, Liquibase Pro Flows, and S3.
 #####################################################################
-name: 'Liquibase Pro Rollback'
+name: 'Liquibase Pro Snapshot'
 run-name: ${{ inputs.environment}} rollback by ${{ github.actor }}
 
 on:
-
   workflow_dispatch:
     # Following are the inputs received via the GitHubActions Run workflow dialog
     inputs:
@@ -14,19 +13,6 @@ on:
       environment:
         description: 'Environment for rollback'
         type: environment
-        required: true
-
-      rollback_type:
-        description: 'Select an option'
-        type: choice
-        required: true
-        options:
-          - rollback_to_tag
-          - rollback_by_label
-
-      lb_tag_or_label:
-        description: 'Tag or Label for Rollback'
-        type: string
         required: true     
 
 ####################################################################
@@ -61,64 +47,33 @@ env:
   LIQUIBASE_LIQUIBASE_SCHEMA_NAME: LB
   
   # Default schema: Specify schema for all changes
-  # LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: Sales
-  # LIQUIBASE_COMMAND_REFERENCE_DEFAULT_SCHEMA_NAME: Sales
+  LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: DBO    
+  LIQUIBASE_COMMAND_REFERENCE_DEFAULT_SCHEMA_NAME: DBO
 
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
   LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
   
-  # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
-  LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog.yaml
-  
   ENVIRONMENT: ${{ inputs.environment }}
+  LB_SCHEMAS: "DBO,Sales"
   
-  ROLLBACK_TYPE: ${{ github.event.inputs.rollback_type }}
-  LB_TAG_OR_LABEL: ${{ github.event.inputs.lb_tag_or_label }}
-  LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
-  LB_SCHEMAS: "DBO,Sales"
+  LIQUIBASE_LOG_FORMAT: JSON_PRETTY
+  LIQUIBASE_LOG_FILE: logs/log.json
 
 jobs:
   #########################################################################
-  #  Rollback
+  #  Snapshot
   #########################################################################
 
-  database-rollback:
+  database-snapshot:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
-    
-    # Specify the Docker container to use for the job
-    container:
-      image: liquibase/liquibase:latest
-      options: --user root
-      
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      
-    - name: Install Extensions Using LPM
-      run: |
-        lpm update
-        lpm add liquibase-s3-extension
-      
-    - name: Flows
-      uses: liquibase-github-actions/flow@v4.32.0
-      with:
-          flowFile: "liquibase-rollback.flowfile.yaml"
-          
-####################################################################
-#  Artifact creation for Reports
-####################################################################
-  # create-reports-artifact:
-    # needs: [database-rollback]
-    # runs-on: [self-hosted]
-    # environment: ${{ inputs.environment }}
-    # if: always()
-
-    # steps:
-      # # Save reports as artifact
-      # - uses: actions/upload-artifact@v4
-        # with:
-          # name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
-          # path: reports/
+    - uses: actions/checkout@v4
+    
+    - name: Setup Liquibase Environment
+      uses: ./.github/workflows/setup-liquibase
+ 
+    - name: Liquibase Rollback Flow
+      run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-snapshot.flowfile.yaml
