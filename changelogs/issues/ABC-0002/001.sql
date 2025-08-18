@@ -31,3 +31,7 @@ create table Sales.Contacts8 (
   dept varchar(30) 
 );
 --rollback DROP TABLE Sales.Contacts8;
+
+--changeset amy.smith:sales_contacts8_delete runAlways:true
+delete from Sales.Contacts8;
+--rollback select '1';
