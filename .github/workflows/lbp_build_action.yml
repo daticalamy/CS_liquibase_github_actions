@@ -2,7 +2,7 @@
 #  GitHub Action to perform a build on the first database, eg. DEV,
 #  using Liquibase Pro, Flows, Policy checks, and S3.
 ##############################################################################
-name: 'Liquibase Pro Build Job - New'
+name: 'Liquibase Pro Build Job'
 run-name: ${{ inputs.environment}} build of current repo by ${{ github.actor }}
 
 on:
@@ -70,8 +70,11 @@ env:
 
   # LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
   LIQUIBASE_REPORT_PATH: reports
+  
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
+  LIQUIBASE_LOG_FORMAT: JSON_PRETTY
+  LIQUIBASE_LOG_FILE: logs/log.json
 
 jobs:
   #########################################################################
@@ -84,68 +87,31 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    # Required for self-hosted runners
-    - uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-    
-    - uses: liquibase/setup-liquibase@v1-beta
-      with:
-        version: '4.32.0'
-        edition: 'pro'
-
-    - name: Download AWS Extension
-      run: |
-        wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
+    - name: Setup Liquibase Environment
+      uses: ./.github/workflows/setup-liquibase
+      
+    - name: Liquibase Checks Flow
+      id: lbp-policy-checks
+      continue-on-error: true
+      run: | 
+        set +e
+        CHECKS_STATUS=$(liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-checks.flowfile.yaml 2>&1)
+        EXIT_CODE=$?
+        set -e
+        if [ $EXIT_CODE -eq 1 ]; then
+          echo "::error::Policy checks did not pass, but allowing build to complete."
+          echo "::error::In non-build environments, this deployment will require Manual Approval."
+          exit $EXIT_CODE
+        fi
 
     - name: Liquibase Build Flow
       run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-build.flowfile.yaml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Auto-generated
 
-####################################################################
-#  Artifact creation for Reports
-####################################################################
-  create-reports-artifact:
-    needs: [database-build]
-    runs-on: [self-hosted]
-    environment: ${{ inputs.environment }}
-    if: always()
-
-    steps:
-      # Save reports as artifact
-      - uses: actions/upload-artifact@v4
-        with:
-          name: REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip
-          path: reports
-
-      # Also zip reports for S3
-      - name: Create zip file for S3
-        run: |
-          if [ -d "reports" ] && [ "$(ls -A reports)" ]; then
-            zip -r REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip reports/
-            echo "zip_created=true" >> $GITHUB_OUTPUT
-            echo "Reports zipped successfully"
-          else
-            echo "zip_created=false" >> $GITHUB_OUTPUT
-            echo "No reports directory found or directory is empty - skipping zip creation"
-          fi
-    
-      # Configure AWS credentials for S3 upload
-      - name: Configure AWS credentials
-        if: steps.create_zip.outputs.zip_created == 'true'
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      # Upload to S3
-      - name: Upload reports to S3
-        if: steps.create_zip.outputs.zip_created == 'true'
-        run: |
-          aws s3 cp REPORTS-${{ github.run_id }}.${{ github.run_number }}.zip \
-            s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports/${{ inputs.environment }}/ \
-            --metadata "run-id=${{ github.run_id }},run-number=${{ github.run_number }},environment=${{ inputs.environment }}"
+    - name: Upload Reports Artifact
+      if: always()
+      uses: ./.github/workflows/upload-reports
+      with:
+        job-type: deploy
+        upload-s3: true
