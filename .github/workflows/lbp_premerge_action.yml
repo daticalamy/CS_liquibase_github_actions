@@ -5,7 +5,7 @@
 #  Liquibase changesets and destroys the copy at the end.
 #  Custom Policy checks and S3.
 #####################################################################
-name: 'Liquibase Pro Premerge Job - New'
+name: 'Liquibase Pro Premerge Job'
 run-name: premerge of current repo by ${{ github.actor }}
 
 on:
@@ -86,32 +86,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # Required for self-hosted runners
-    - uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-        
-    - uses: liquibase/setup-liquibase@v1-beta
-      with:
-        version: '4.32.0'
-        edition: 'pro'
-
-    - name: Download AWS Extension
-      run: |
-        wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
+    - name: Setup Liquibase Environment
+      uses: ./.github/workflows/setup-liquibase
     
     # Required to run commands for Cloning DB
-    - name: Install Sqlcmd
-      run: |
-        curl https://packages.microsoft.com/config/rhel/8/prod.repo | sudo tee /etc/yum.repos.d/msprod.repo
-        sudo ACCEPT_EULA=Y yum install -y mssql-tools18 unixODBC-devel
-        echo "/opt/mssql-tools18/bin" >> $GITHUB_PATH
-
-    - name: Check Sqlcmd installation
-      run: |
-        echo "sqlcmd version:"
-        sqlcmd -?
+    - name: Install MSSQL Client tools
+      uses: ./.github/workflows/install-mssql-client-tools
         
     - name: Liquibase Premerge Flow
       run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-premerge.flowfile.yaml
