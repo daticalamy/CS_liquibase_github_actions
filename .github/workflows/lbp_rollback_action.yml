@@ -2,11 +2,10 @@
 #  GitHub Action to perform an environment-targeted rollback of
 #  database changes using Liquibase Pro, Liquibase Pro Flows, and S3.
 #####################################################################
-name: 'Liquibase Pro Rollback - New'
+name: 'Liquibase Pro Rollback'
 run-name: ${{ inputs.environment}} rollback by ${{ github.actor }}
 
 on:
-
   workflow_dispatch:
     # Following are the inputs received via the GitHubActions Run workflow dialog
     inputs:
@@ -74,10 +73,15 @@ env:
   
   ROLLBACK_TYPE: ${{ github.event.inputs.rollback_type }}
   LB_TAG_OR_LABEL: ${{ github.event.inputs.lb_tag_or_label }}
-  LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
+  LB_SCHEMAS: "DBO,Sales"
+  
+  # LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
+  LIQUIBASE_REPORT_PATH: reports
+  
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
-  LB_SCHEMAS: "DBO,Sales"
+  LIQUIBASE_LOG_FORMAT: JSON_PRETTY
+  LIQUIBASE_LOG_FILE: logs/log.json
 
 jobs:
   #########################################################################
@@ -90,20 +94,15 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    # Required for self-hosted runners
-    - uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-    
-    - uses: liquibase/setup-liquibase@v1-beta
-      with:
-        version: '4.32.0'
-        edition: 'pro'
-        
-    - name: Download AWS Extension
-      run: |
-        wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar 
+    - name: Setup Liquibase Environment
+      uses: ./.github/workflows/setup-liquibase
  
     - name: Liquibase Rollback Flow
       run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-rollback.flowfile.yaml
+      
+    - name: Upload Reports Artifact
+      if: always()
+      uses: ./.github/workflows/upload-reports
+      with:
+        job-type: deploy
+        upload-s3: true

@@ -86,7 +86,7 @@ jobs:
   #  Deploy
   #########################################################################
 
-    run-policy-checks:
+  run-policy-checks:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
     outputs:
