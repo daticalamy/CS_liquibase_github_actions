@@ -3,11 +3,10 @@
 #  database changes using Liquibase Pro, Liquibase Pro Flows,
 #  Custom Quality checks and S3.
 #####################################################################
-name: 'Liquibase Pro Deployment Job - New'
+name: 'Liquibase Pro Deployment Job'
 run-name: ${{ inputs.environment}} deployment of current repo by ${{ github.actor }}
 
 on:
-
   workflow_dispatch:
     # Following are the inputs received via the GitHubActions Run workflow dialog
     inputs:
@@ -71,18 +70,23 @@ env:
   
   ENVIRONMENT: ${{ inputs.environment }}
   LB_TAG: ${{ github.event.inputs.lb_tag || github.ref_name }}
-  LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
-  # Values: OFF, SEVERE, WARNING, INFO, FINE
-  LIQUIBASE_LOG_LEVEL: INFO
   LB_CHECK_DRIFT: ${{ github.event.inputs.check_drift }}
   LB_SCHEMAS: "DBO,Sales"
+  
+  # Values: OFF, SEVERE, WARNING, INFO, FINE
+  LIQUIBASE_LOG_LEVEL: INFO
+  LIQUIBASE_LOG_FORMAT: JSON_PRETTY
+  LIQUIBASE_LOG_FILE: logs/log.json
+  
+  # LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
+  LIQUIBASE_REPORT_PATH: reports
 
 jobs:
   #########################################################################
   #  Deploy
   #########################################################################
 
-  database-deploy:
+    run-policy-checks:
     runs-on: [self-hosted]
     environment: ${{ inputs.environment }}
     outputs:
@@ -91,26 +95,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
    
-    # Required for self-hosted runners
-    - uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-
-    - uses: liquibase/setup-liquibase@v1-beta
-      with:
-        version: '4.32.0'
-        edition: 'pro'
-
-    - name: Download AWS Extension
-      run: |
-        wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
+    - name: Setup Liquibase Environment
+      uses: ./.github/workflows/setup-liquibase
 
     - name: Liquibase Checks Flow
       id: lbp-policy-checks
-      run: | 
-        liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-checks.flowfile.yaml
-      
+      run: |       
         set +e
         CHECKS_STATUS=$(liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-checks.flowfile.yaml 2>&1)
         EXIT_CODE=$?
@@ -125,18 +115,23 @@ jobs:
           echo "exit_message=✅ Liquibase checks passed" >> $GITHUB_OUTPUT
           echo "✅ Proceeding automatically"
         fi
-        echo "Test msg C"
+
+    - name: Upload Reports Artifact
+      if: always()
+      uses: ./.github/workflows/upload-reports
+      with:
+        job-type: checks
       
   manual-approval:
     runs-on: [self-hosted]
-    needs: database-deploy
+    needs: run-policy-checks
     environment: manual-approval
-    if: needs.database-deploy.outputs.needs_approval == 'true'
+    if: needs.run-policy-checks.outputs.needs_approval == 'true'
     steps:
     - name: Request manual approval
       run: |
         echo "🚨 Manual approval required!"
-        echo "Exit message: ${{ needs.database-deploy.outputs.exit_message }}"
+        echo "Exit message: ${{ needs.run-policy-checks.outputs.exit_message }}"
         echo "Click 'Review deployments' to approve or reject this deployment."
         echo ""
         echo "To approve: Click 'Review deployments' button above"
@@ -144,26 +139,21 @@ jobs:
       
   deploy:
     runs-on: [self-hosted]
-    needs: [database-deploy, manual-approval]
+    needs: [run-policy-checks, manual-approval]
     environment: ${{ inputs.environment }}
-    if: always() && (needs.database-deploy.outputs.needs_approval == 'false' || needs.manual-approval.result == 'success')
+    if: always() && (needs.run-policy-checks.outputs.needs_approval == 'false' || needs.manual-approval.result == 'success')
     steps:
     - uses: actions/checkout@v4    
 
-    # Required for self-hosted runners
-    - uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-
-    - uses: liquibase/setup-liquibase@v1-beta
-      with:
-        version: '4.32.0'
-        edition: 'pro'
-
-    - name: Download AWS Extension
-      run: |
-        wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
+    - name: Setup Liquibase Environment
+      uses: ./.github/workflows/setup-liquibase
 
     - name: Liquibase Deploy Flow
       run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-deploy.flowfile.yaml
+
+    - name: Upload Reports Artifact
+      if: always()
+      uses: ./.github/workflows/upload-reports
+      with:
+        job-type: deploy
+        upload-s3: true
