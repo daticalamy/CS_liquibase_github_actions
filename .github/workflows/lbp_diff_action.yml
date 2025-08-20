@@ -86,9 +86,9 @@ jobs:
       - name: Get Source Environment Secrets
         id: source
         run: |
-          echo "url=${{ secrets.LIQUIBASE_URL }}" >> $GITHUB_OUTPUT
-          echo "username=${{ secrets.LIQUIBASE_USERNAME }}" >> $GITHUB_OUTPUT
-          echo "password=${{ secrets.LIQUIBASE_PASSWORD }}" >> $GITHUB_OUTPUT
+          echo "source_url=${{ secrets.LIQUIBASE_URL }}" >> $GITHUB_OUTPUT
+          echo "source_username=${{ secrets.LIQUIBASE_USERNAME }}" >> $GITHUB_OUTPUT
+          echo "source_password=${{ secrets.LIQUIBASE_PASSWORD }}" >> $GITHUB_OUTPUT
 
   get-target-secrets:
     runs-on: [self-hosted]
@@ -101,9 +101,9 @@ jobs:
       - name: Get Target Environment Secrets
         id: target
         run: |
-          echo "url=${{ secrets.LIQUIBASE_URL }}" >> $GITHUB_OUTPUT
-          echo "username=${{ secrets.LIQUIBASE_USERNAME }}" >> $GITHUB_OUTPUT
-          echo "password=${{ secrets.LIQUIBASE_PASSWORD }}" >> $GITHUB_OUTPUT
+          echo "target_url=${{ secrets.LIQUIBASE_URL }}" >> $GITHUB_OUTPUT
+          echo "target_username=${{ secrets.LIQUIBASE_USERNAME }}" >> $GITHUB_OUTPUT
+          echo "target_password=${{ secrets.LIQUIBASE_PASSWORD }}" >> $GITHUB_OUTPUT
 
   database-diff:
     runs-on: [self-hosted]
