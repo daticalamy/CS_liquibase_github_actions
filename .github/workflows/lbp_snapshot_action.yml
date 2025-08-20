@@ -3,7 +3,7 @@
 #  a database using Liquibase Pro, Liquibase Pro Flows, and S3.
 #####################################################################
 name: 'Liquibase Pro Snapshot'
-run-name: ${{ inputs.environment}} rollback by ${{ github.actor }}
+run-name: ${{ inputs.environment}} snapshot by ${{ github.actor }}
 
 on:
   workflow_dispatch:
@@ -11,7 +11,7 @@ on:
     inputs:
       # The type 'environment' will automatically pull in the environments created in GitHub
       environment:
-        description: 'Environment for rollback'
+        description: 'Environment for snapshot'
         type: environment
         required: true     
 
@@ -75,5 +75,5 @@ jobs:
     - name: Setup Liquibase Environment
       uses: ./.github/workflows/setup-liquibase
  
-    - name: Liquibase Rollback Flow
+    - name: Liquibase Snapshot Flow
       run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-snapshot.flowfile.yaml

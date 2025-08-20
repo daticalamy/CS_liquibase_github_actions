@@ -1,0 +1,136 @@
+####################################################################
+#  GitHub Action for Diff
+#  database changes using Liquibase Pro.
+#####################################################################
+name: 'Liquibase Pro Diff'
+run-name: ${{ inputs.source_environment}} to ${{ inputs.target_environment}} diff by ${{ github.actor }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_environment:
+        description: 'Source Environment'
+        required: true
+        type: choice
+        options:
+          - DEV
+          - TEST
+          - PROD
+      target_environment:
+        description: 'Target Environment'
+        required: true
+        type: choice
+        options:
+          - DEV
+          - TEST
+          - PROD 
+
+####################################################################
+#  Set up the environment
+#####################################################################
+env:
+  # AWS S3 bucket is the host part of the S3 bucket
+  AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+  
+  # AWS Access credentials use by the Liquibase Pro S3 Extension
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+
+  # Default AWS region
+  AWS_REGION: us-east-1
+  
+  # Pro License key
+  # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
+  LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }}
+  
+  # JDBC URL of the database per environment
+  # See https://docs.liquibase.com/workflows/liquibase-community/using-jdbc-url-in-liquibase.html
+  # LIQUIBASE_COMMAND_URL: ${{ secrets.LIQUIBASE_URL }}
+
+  # Credentials for the environment's database https://docs.liquibase.com/parameters/command-parameters.html
+  # LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
+  # LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
+
+  # Liquibase schema: Specified to allow flexibility in storage of Liquibase Change Tracking Tables
+  # See https://docs.liquibase.com/parameters/liquibase-schema-name.html
+  # LIQUIBASE_LIQUIBASE_SCHEMA_NAME: LB
+  
+  # Default schema: Specify schema for all changes
+  LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: DBO    
+  LIQUIBASE_COMMAND_REFERENCE_DEFAULT_SCHEMA_NAME: DBO
+
+  # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
+  LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
+  
+  # ENVIRONMENT: ${{ inputs.environment }}
+  LB_SCHEMAS: "DBO,Sales"
+  
+  # Values: OFF, SEVERE, WARNING, INFO, FINE
+  LIQUIBASE_LOG_LEVEL: INFO
+  LIQUIBASE_LOG_FORMAT: JSON_PRETTY
+  LIQUIBASE_LOG_FILE: logs/log.json
+
+jobs:
+  #########################################################################
+  #  Diff
+  #########################################################################
+  get-source-secrets:
+    runs-on: [self-hosted]
+    environment: ${{ github.event.inputs.source_environment }}
+    outputs:
+      source_url: ${{ steps.source.outputs.url }}
+      source_username: ${{ steps.source.outputs.username }}
+      source_password: ${{ steps.source.outputs.password }}
+    steps:
+      - name: Get Source Environment Secrets
+        id: source
+        run: |
+          echo "url=${{ secrets.LIQUIBASE_URL }}" >> $GITHUB_OUTPUT
+          echo "username=${{ secrets.LIQUIBASE_USERNAME }}" >> $GITHUB_OUTPUT
+          echo "password=${{ secrets.LIQUIBASE_PASSWORD }}" >> $GITHUB_OUTPUT
+
+  get-target-secrets:
+    runs-on: [self-hosted]
+    environment: ${{ github.event.inputs.target_environment }}
+    outputs:
+      target_url: ${{ steps.target.outputs.url }}
+      target_username: ${{ steps.target.outputs.username }}
+      target_password: ${{ steps.target.outputs.password }}
+    steps:
+      - name: Get Target Environment Secrets
+        id: target
+        run: |
+          echo "url=${{ secrets.LIQUIBASE_URL }}" >> $GITHUB_OUTPUT
+          echo "username=${{ secrets.LIQUIBASE_USERNAME }}" >> $GITHUB_OUTPUT
+          echo "password=${{ secrets.LIQUIBASE_PASSWORD }}" >> $GITHUB_OUTPUT
+
+  database-diff:
+    runs-on: [self-hosted]
+    needs: [get-source-secrets, get-target-secrets]
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Liquibase Environment
+      uses: ./.github/workflows/setup-liquibase
+
+    - name: Run Liquibase Diff
+      env:
+        SOURCE_DB_URL: ${{ needs.get-source-secrets.outputs.source_url }}
+        SOURCE_DB_USERNAME: ${{ needs.get-source-secrets.outputs.source_username }}
+        SOURCE_DB_PASSWORD: ${{ needs.get-source-secrets.outputs.source_password }}
+        TARGET_DB_URL: ${{ needs.get-target-secrets.outputs.target_url }}
+        TARGET_DB_USERNAME: ${{ needs.get-target-secrets.outputs.target_username }}
+        TARGET_DB_PASSWORD: ${{ needs.get-target-secrets.outputs.target_password }}
+      run: |
+        liquibase \\
+          --url="${SOURCE_DB_URL}" \\
+          --username="${SOURCE_DB_USERNAME}" \\
+          --password="${SOURCE_DB_PASSWORD}" \\
+          --referenceUrl="${TARGET_DB_URL}" \\
+          --referenceUsername="${TARGET_DB_USERNAME}" \\
+          --referencePassword="${TARGET_DB_PASSWORD}" \\
+          diff
+
+#    - name: Liquibase Diff Flow
+#      run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-diff.flowfile.yaml
