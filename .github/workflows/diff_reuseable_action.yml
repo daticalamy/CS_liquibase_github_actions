@@ -103,11 +103,11 @@ jobs:
           source source_config.properties
           source target_config.properties
           
-          liquibase \\
-            --url="${url}" \\
-            --username="${username}" \\
-            --password="${password}" \\
-            --reference-url="${referenceUrl}" \\
-            --reference-username="${referenceUsername}" \\
-            --reference-password="${referencePassword}" \\
+          liquibase \
+            --url="${url}" \
+            --username="${username}" \
+            --password="${password}" \
+            --reference-url="${referenceUrl}" \
+            --reference-username="${referenceUsername}" \
+            --reference-password="${referencePassword}" \
             diff
