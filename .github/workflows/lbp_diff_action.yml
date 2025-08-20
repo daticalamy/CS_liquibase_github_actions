@@ -127,9 +127,9 @@ jobs:
           --url="${SOURCE_DB_URL}" \
           --username="${SOURCE_DB_USERNAME}" \
           --password="${SOURCE_DB_PASSWORD}" \
-          --referenceUrl="${TARGET_DB_URL}" \
-          --referenceUsername="${TARGET_DB_USERNAME}" \
-          --referencePassword="${TARGET_DB_PASSWORD}" \
+          --reference-url="${TARGET_DB_URL}" \
+          --reference-username="${TARGET_DB_USERNAME}" \
+          --reference-password="${TARGET_DB_PASSWORD}" \
           diff
 
 #    - name: Liquibase Diff Flow
