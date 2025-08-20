@@ -1,6 +1,5 @@
-# .github/workflows/reuseable-diff/action.yml
 name: 'Reuseable Liquibase Pro Diff'
-description: 'Sets up sqlcmd'
+description: 'Sets up Source and Target db info'
 
 on:
   workflow_call:
