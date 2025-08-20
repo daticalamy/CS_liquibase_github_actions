@@ -1,0 +1,84 @@
+# .github/workflows/reuseable-diff/action.yml
+name: 'Reuseable Liquibase Pro Diff'
+description: 'Sets up sqlcmd'
+
+on:
+  workflow_call:
+    inputs:
+      source_environment:
+        required: true
+        type: string
+      target_environment:
+        required: true
+        type: string 
+
+jobs:
+  get-source-secrets:
+    runs-on: [self-hosted]
+    environment: ${{ inputs.source_environment }}
+    steps:
+      - name: Create source config
+        run: |
+          cat << EOF > source_config.properties
+          url=${{ secrets.LIQUIBASE_URL }}
+          username=${{ secrets.LIQUIBASE_USERNAME }}
+          password=${{ secrets.LIQUIBASE_PASSWORD }}
+          EOF
+      
+      - name: Upload source config
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-config
+          path: source_config.properties
+
+  get-target-secrets:
+    runs-on: [self-hosted]
+    environment: ${{ inputs.target_environment }}
+    steps:
+      - name: Create target config
+        run: |
+          cat << EOF > target_config.properties
+          referenceUrl=${{ secrets.LIQUIBASE_URL }}
+          referenceUsername=${{ secrets.LIQUIBASE_USERNAME }}
+          referencePassword=${{ secrets.LIQUIBASE_PASSWORD }}
+          EOF
+      
+      - name: Upload target config
+        uses: actions/upload-artifact@v4
+        with:
+          name: target-config
+          path: target_config.properties
+
+  liquibase-diff:
+    runs-on: [self-hosted]
+    needs: [get-source-secrets, get-target-secrets]
+    steps:
+    - uses: actions/checkout@v4
+  
+    - name: Download source config
+        uses: actions/download-artifact@v4
+        with:
+          name: source-config
+      
+    - name: Download target config
+        uses: actions/download-artifact@v4
+        with:
+          name: target-config
+    
+    - name: Setup Liquibase Environment
+      uses: ./.github/workflows/setup-liquibase
+
+    - name: Run Liquibase Diff
+        run: |
+          # Load configurations from files
+          source source_config.properties
+          source target_config.properties
+          
+          liquibase \\
+            --url="${url}" \\
+            --username="${username}" \\
+            --password="${password}" \\
+            --reference-url="${referenceUrl}" \\
+            --reference-username="${referenceUsername}" \\
+            --reference-password="${referencePassword}" \\
+            diff
