@@ -82,13 +82,15 @@ jobs:
       source_url: ${{ steps.source.outputs.url }}
       source_username: ${{ steps.source.outputs.username }}
       source_password: ${{ steps.source.outputs.password }}
+      source_text: ${{ steps.source.outputs.text }}
     steps:
       - name: Get Source Environment Secrets
         id: source
         run: |
-          echo "source_url=${{ secrets.LIQUIBASE_URL }}" >> $GITHUB_OUTPUT
-          echo "source_username=${{ secrets.LIQUIBASE_USERNAME }}" >> $GITHUB_OUTPUT
-          echo "source_password=${{ secrets.LIQUIBASE_PASSWORD }}" >> $GITHUB_OUTPUT
+          echo "url=${{ secrets.LIQUIBASE_URL }}" >> $GITHUB_OUTPUT
+          echo "username=${{ secrets.LIQUIBASE_USERNAME }}" >> $GITHUB_OUTPUT
+          echo "password=${{ secrets.LIQUIBASE_PASSWORD }}" >> $GITHUB_OUTPUT
+          echo "text=testA" >> $GITHUB_OUTPUT
 
   get-target-secrets:
     runs-on: [self-hosted]
@@ -97,13 +99,15 @@ jobs:
       target_url: ${{ steps.target.outputs.url }}
       target_username: ${{ steps.target.outputs.username }}
       target_password: ${{ steps.target.outputs.password }}
+      target_text: ${{ steps.target.outputs.text }}
     steps:
       - name: Get Target Environment Secrets
         id: target
         run: |
-          echo "target_url=${{ secrets.LIQUIBASE_URL }}" >> $GITHUB_OUTPUT
-          echo "target_username=${{ secrets.LIQUIBASE_USERNAME }}" >> $GITHUB_OUTPUT
-          echo "target_password=${{ secrets.LIQUIBASE_PASSWORD }}" >> $GITHUB_OUTPUT
+          echo "url=${{ secrets.LIQUIBASE_URL }}" >> $GITHUB_OUTPUT
+          echo "username=${{ secrets.LIQUIBASE_USERNAME }}" >> $GITHUB_OUTPUT
+          echo "password=${{ secrets.LIQUIBASE_PASSWORD }}" >> $GITHUB_OUTPUT
+          echo "text=testB" >> $GITHUB_OUTPUT
 
   database-diff:
     runs-on: [self-hosted]
@@ -119,10 +123,14 @@ jobs:
         SOURCE_DB_URL: ${{ needs.get-source-secrets.outputs.source_url }}
         SOURCE_DB_USERNAME: ${{ needs.get-source-secrets.outputs.source_username }}
         SOURCE_DB_PASSWORD: ${{ needs.get-source-secrets.outputs.source_password }}
+        SOURCE_TEXT: ${{ needs.get-source-secrets.outputs.source_text }}
         TARGET_DB_URL: ${{ needs.get-target-secrets.outputs.target_url }}
         TARGET_DB_USERNAME: ${{ needs.get-target-secrets.outputs.target_username }}
         TARGET_DB_PASSWORD: ${{ needs.get-target-secrets.outputs.target_password }}
+        TARGET_TEXT: ${{ needs.get-target-secrets.outputs.target_text }}
       run: |
+        echo "TEST SOURCE TEXT: ${SOURCE_TEXT}"
+        echo "TEST TARGET TEXT: ${TARGET_TEXT}"
         liquibase \
           --url="${SOURCE_DB_URL}" \
           --username="${SOURCE_DB_USERNAME}" \
