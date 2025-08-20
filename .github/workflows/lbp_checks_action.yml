@@ -69,7 +69,6 @@ env:
   CURRENT_BRANCH: main
   PYTHON_CHECKS_GITHUB_TOKEN: ${{ secrets.PYTHON_CHECKS_GITHUB_TOKEN }}
   
-  ENVIRONMENT: ${{ inputs.environment }}
   BRANCH: ${{ github.ref_name }}
 
   # LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports

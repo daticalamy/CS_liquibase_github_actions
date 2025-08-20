@@ -76,7 +76,7 @@ jobs:
   #  Diff
   #########################################################################
   run-diff:
-    uses: ./.github/workflows/reusable-diff
+    uses: ./.github/workflows/diff_reuseable_action.yml
     with:
       source_environment: ${{ github.event.inputs.source_environment }}
       target_environment: ${{ github.event.inputs.target_environment }}
