@@ -47,6 +47,10 @@ jobs:
     environment: ${{ inputs.source_environment }}
     steps:
       - name: Create source config
+        env:
+          LIQUIBASE_URL: ${{ secrets.LIQUIBASE_URL }}
+          LIQUIBASE_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
+          LIQUIBASE_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
         run: |
           cat << EOF > source_config.properties
           url=${{ secrets.LIQUIBASE_URL }}

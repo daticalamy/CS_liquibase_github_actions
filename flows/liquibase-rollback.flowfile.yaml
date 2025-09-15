@@ -6,7 +6,6 @@ globalVariables:
   TAG_OR_LABEL: ${LB_TAG_OR_LABEL}
   ENV: ${ENVIRONMENT}
   BUCKET: ${AWS_S3_BUCKET}
-  CHECK_DRIFT: ${LB_CHECK_DRIFT}
   SCHEMAS: ${LB_SCHEMAS} 
 
 stages:
