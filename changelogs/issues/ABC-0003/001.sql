@@ -199,8 +199,7 @@ GRANT EXECUTE
     ON OBJECT::[dbo].[Proc_TestProc] TO [DATICAL_USER]
     AS [dbo];
 
--- rollback
-
+/* liquibase rollback
 -- =============================================
 -- Author:		ASMITH
 -- Create date: 2025-09-15
@@ -383,3 +382,4 @@ GO
 GRANT EXECUTE
     ON OBJECT::[dbo].[Proc_TestProc] TO [DATICAL_USER]
     AS [dbo];
+*/
