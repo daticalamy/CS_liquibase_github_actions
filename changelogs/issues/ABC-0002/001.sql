@@ -35,3 +35,9 @@ create table Sales.Contacts8 (
 --changeset amy.smith:sales_contacts8_delete runAlways:true
 delete from Sales.Contacts8;
 --rollback select '1';
+
+--changeset amy.smith:sales_contacts9_delete runAlways:true
+delete from Sales.Contacts8;
+--rollback |
+select 
+'1';

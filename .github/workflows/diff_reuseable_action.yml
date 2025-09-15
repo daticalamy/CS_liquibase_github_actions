@@ -1,5 +1,4 @@
 name: 'Reuseable Liquibase Pro Diff'
-description: 'Sets up Source and Target db info'
 
 on:
   workflow_call:
@@ -11,12 +10,47 @@ on:
         required: true
         type: string 
 
+####################################################################
+#  Set up the environment
+#####################################################################
+env:
+  # AWS S3 bucket is the host part of the S3 bucket
+  AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+  
+  # AWS Access credentials use by the Liquibase Pro S3 Extension
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+
+  # Default AWS region
+  AWS_REGION: us-east-1
+  
+  # Pro License key
+  # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
+  LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }}
+
+  LIQUIBASE_COMMAND_DEFAULT_SCHEMA_NAME: DBO    
+  LIQUIBASE_COMMAND_REFERENCE_DEFAULT_SCHEMA_NAME: DBO
+
+  # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
+  LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
+  
+  LB_SCHEMAS: "DBO,Sales"
+  
+  LIQUIBASE_LOG_LEVEL: INFO
+  LIQUIBASE_LOG_FORMAT: JSON_PRETTY
+  LIQUIBASE_LOG_FILE: logs/log.json
+
 jobs:
   get-source-secrets:
     runs-on: [self-hosted]
     environment: ${{ inputs.source_environment }}
     steps:
       - name: Create source config
+        env:
+          LIQUIBASE_URL: ${{ secrets.LIQUIBASE_URL }}
+          LIQUIBASE_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
+          LIQUIBASE_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
         run: |
           cat << EOF > source_config.properties
           url=${{ secrets.LIQUIBASE_URL }}
@@ -55,29 +89,29 @@ jobs:
     - uses: actions/checkout@v4
   
     - name: Download source config
-        uses: actions/download-artifact@v4
-        with:
-          name: source-config
+      uses: actions/download-artifact@v4
+      with:
+        name: source-config
       
     - name: Download target config
-        uses: actions/download-artifact@v4
-        with:
-          name: target-config
+      uses: actions/download-artifact@v4
+      with:
+        name: target-config
     
     - name: Setup Liquibase Environment
       uses: ./.github/workflows/setup-liquibase
 
     - name: Run Liquibase Diff
-        run: |
+      run: |
           # Load configurations from files
           source source_config.properties
           source target_config.properties
           
-          liquibase \\
-            --url="${url}" \\
-            --username="${username}" \\
-            --password="${password}" \\
-            --reference-url="${referenceUrl}" \\
-            --reference-username="${referenceUsername}" \\
-            --reference-password="${referencePassword}" \\
+          liquibase \
+            --url="${url}" \
+            --username="${username}" \
+            --password="${password}" \
+            --reference-url="${referenceUrl}" \
+            --reference-username="${referenceUsername}" \
+            --reference-password="${referencePassword}" \
             diff
