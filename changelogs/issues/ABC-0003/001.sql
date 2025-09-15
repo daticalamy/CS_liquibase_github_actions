@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset asmith:update_sql
+--changeset asmith:update_sql labels:abc-0003 
 
 -- =============================================
 -- Author:		ASMITH
