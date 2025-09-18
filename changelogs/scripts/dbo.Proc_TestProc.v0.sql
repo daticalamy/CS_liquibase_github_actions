@@ -1,6 +1,3 @@
---liquibase formatted sql
-
---changeset asmith:update_sql
 -- =============================================
 -- Author:		ASMITH
 -- Create date: 2025-09-15
@@ -22,7 +19,7 @@ BEGIN
 	--DECLARE @locGlAcct_Ilevel as int = 76
 
 	DECLARE @locEmailMessage varchar(max)= ''
-	DECLARE @locEmailRecipients varchar(400) = 'asmith@noemail.org'
+	DECLARE @locEmailRecipients varchar(400) = 'asmith0@noemail.org' --'asmith@noemail.org'
 	DECLARE @locEmailRecipientsBcc varchar(400) = 'asmith@noemail.org'
 	Declare @Loc_EmailAddressForMasterOnDb varchar(250) = dbo.sysAdminConstants('MASTER','EMAIL')
 	
@@ -49,17 +46,6 @@ BEGIN
  	--------------------------------------------
 	--	GET THE DATA
 	--------------------------------------------
-	DECLARE @AdditionalAllowedCourses TABLE
-	(
-		ClassGenericid int
-	);
-
-	INSERT INTO @AdditionalAllowedCourses
-	SELECT classGenericid FROM ClassesGeneric WHERE classcode IN (
-		'ABCGUV',
-		'ABCCMP',
-		'ABCCST'
-	)
 
 select
 RowNum = ROW_NUMBER() OVER (ORDER BY DateCompleted asc )
@@ -68,10 +54,7 @@ into #tempAttendanceRecordsABC
 from (select S.NameLastFirstPlusID, cr.ClassDescriptionForDisplay, convert(varchar,r.ClassDate,101) as ClassDate, r.Grade, convert(varchar,r.TimeIn,101) as DateStarted, convert(varchar,r.TimeOut,101) as DateCompleted
        from classesgeneric cr left join registration R on r.classgenericid_regi = cr.classgenericid
        left join STUDENTS S on R.studentid = S.Studentid
-       where R.Grade IN ('P', 'F') AND (
-			R.Classgenericid_Regi in (10232,10234,10265,10755,10756)
-			OR R.Classgenericid_Regi in (Select ClassGenericid FROM @AdditionalAllowedCourses)
-       ) AND R.TimeOut > dateadd(DAY,-7,getdate()))
+       where R.Grade IN ('P', 'F') AND R.Classgenericid_Regi in (10232,10234,10265,10755,10756) AND R.TimeOut > dateadd(DAY,-7,getdate()))  
 as T ORDER BY DateCompleted
 
 --select
@@ -115,7 +98,7 @@ as T ORDER BY DateCompleted
 	-----------------------------------------------------------
 		set @locEmailMessage = '<br/>'
 		set @locEmailMessage = @locEmailMessage +'<br/><br/>=================<br/>'
-		set @locEmailMessage = @locEmailMessage +'Company: ABC'
+		set @locEmailMessage = @locEmailMessage +'Company: BAC'
 		set @locEmailMessage = @locEmailMessage +'<br/>'
 		--set @locEmailMessage = @locEmailMessage +'Total number of records: '
 		set @locEmailMessage = @locEmailMessage +'This is a list of training records that were completed in the past week'
@@ -196,6 +179,4 @@ GRANT EXECUTE
 GO
 GRANT EXECUTE
     ON OBJECT::[dbo].[Proc_TestProc] TO [DATICAL_USER]
-    AS [dbo];	
---rollbackSqlFile path:scripts/dbo.Proc_TestProc.v0.sql
-
+    AS [dbo];

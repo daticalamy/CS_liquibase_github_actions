@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: update_sql2
+      author: asmith
+      changes:
+        - sqlFile:
+            path: scripts/dbo.Proc_TestProc.v2.sql
+      rollback:
+        - sqlFile:
+            path: scripts/dbo.Proc_TestProc.v0.sql
