@@ -1,6 +1,11 @@
 --liquibase formatted sql
 
+<<<<<<< HEAD
 --changeset asmith:update_sql
+=======
+--changeset asmith:update_sql labels:abc-0003 
+
+>>>>>>> 52e138ea3db671d52fa1fef433b071f6897fefca
 -- =============================================
 -- Author:		ASMITH
 -- Create date: 2025-09-15
