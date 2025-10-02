@@ -71,7 +71,8 @@ env:
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
   LIQUIBASE_LOG_FORMAT: JSON_PRETTY
-  LIQUIBASE_LOG_FILE: logs/log.json  
+  LIQUIBASE_LOG_FILE: logs/log.json
+  LIQUIBASE_DBCLHISTORY_ENABLED: true  
   
   # Prevalidate Settings
   LB_CLONED_URL: "jdbc:sqlserver://${{ secrets.LIQUIBASE_HOSTNAME }}:${{ secrets.LIQUIBASE_PORT }};databaseName=${{ secrets.LIQUIBASE_DATABASE_NAME }}_eph;trustServerCertificate=true"
