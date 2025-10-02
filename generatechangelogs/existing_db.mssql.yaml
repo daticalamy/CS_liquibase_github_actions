@@ -1,0 +1,136 @@
+databaseChangeLog:
+- changeSet:
+    id: 1758053577032-1
+    author: AmySmith (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            computed: false
+            constraints:
+              nullable: false
+            name: ID
+            type: nvarchar(255)
+        - column:
+            computed: false
+            constraints:
+              nullable: false
+            name: AUTHOR
+            type: nvarchar(255)
+        - column:
+            computed: false
+            constraints:
+              nullable: false
+            name: FILENAME
+            type: nvarchar(255)
+        - column:
+            computed: false
+            constraints:
+              nullable: false
+            name: DATEEXECUTED
+            type: datetime2(3)
+        - column:
+            computed: false
+            constraints:
+              nullable: false
+            name: ORDEREXECUTED
+            type: int
+        - column:
+            computed: false
+            constraints:
+              nullable: false
+            name: EXECTYPE
+            type: nvarchar(10)
+        - column:
+            computed: false
+            name: MD5SUM
+            type: nvarchar(35)
+        - column:
+            computed: false
+            name: DESCRIPTION
+            type: nvarchar(255)
+        - column:
+            computed: false
+            name: COMMENTS
+            type: nvarchar(255)
+        - column:
+            computed: false
+            name: TAG
+            type: nvarchar(255)
+        - column:
+            computed: false
+            name: LIQUIBASE
+            type: nvarchar(20)
+        - column:
+            computed: false
+            name: CONTEXTS
+            type: nvarchar(255)
+        - column:
+            computed: false
+            name: LABELS
+            type: nvarchar(255)
+        - column:
+            computed: false
+            name: DEPLOYMENT_ID
+            type: nvarchar(10)
+        tableName: DATABASECHANGELOG
+- changeSet:
+    id: 1758053577032-2
+    author: AmySmith (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            computed: false
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PK_DATABASECHANGELOGLOCK
+            name: ID
+            type: int
+        - column:
+            computed: false
+            constraints:
+              nullable: false
+            name: LOCKED
+            type: bit
+        - column:
+            computed: false
+            name: LOCKGRANTED
+            type: datetime2(3)
+        - column:
+            computed: false
+            name: LOCKEDBY
+            type: nvarchar(255)
+        tableName: DATABASECHANGELOGLOCK
+- changeSet:
+    id: 1758053577032-3
+    author: AmySmith (generated)
+    changes:
+    - createView:
+        fullDefinition: true
+        selectQuery: |-
+          CREATE VIEW dbo.[Brazil Customers] AS
+          SELECT ID, AUTHOR, FILENAME, TAG, LABELS
+          FROM dbo.DATABASECHANGELOG
+          WHERE AUTHOR = 'Brazil';
+        viewName: Brazil Customers
+- changeSet:
+    id: 1758053577032-4
+    author: AmySmith (generated)
+    changes:
+    - createProcedure:
+        path: objects/storedprocedure/Proc_TestProc.sql
+        procedureName: Proc_TestProc
+        relativeToChangelogFile: true
+        replaceIfExists: true
+- changeSet:
+    id: 1758053577032-5
+    author: AmySmith (generated)
+    changes:
+    - createProcedure:
+        path: objects/storedprocedure/getCustomerCompany.sql
+        procedureName: getCustomerCompany
+        relativeToChangelogFile: true
+        replaceIfExists: true
+
