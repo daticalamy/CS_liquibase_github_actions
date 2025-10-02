@@ -1,8 +1,8 @@
 #############################################################################
 #  GitHub Action to perform a build on the first database, eg. DEV,
-#  using Liquibase Pro, Flows, Policy checks, and S3.
+#  using Liquibase Secure, Flows, Policy checks, and Azure Storage.
 ##############################################################################
-name: 'Liquibase Pro Build Job'
+name: 'Liquibase Build Job'
 run-name: ${{ inputs.environment}} build of current repo by ${{ github.actor }}
 
 on:
@@ -25,16 +25,13 @@ on:
 #  Set up the environment
 #####################################################################
 env:
-  # AWS S3 bucket is the host part of the S3 bucket
-  AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-  
-  # AWS Access credentials use by the Liquibase Pro S3 Extension
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
 
-  # Default AWS region
-  AWS_REGION: us-east-1
+  # Azure Storage account and container to hold reports
+  LIQUIBASE_AZURE_STORAGE_ACCOUNT: cssnapshots
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  AZURE_CONTAINER: reports
   
   # Pro License key
   # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
@@ -66,8 +63,7 @@ env:
   BRANCH: ${{ github.ref_name }}
   LB_TAG: ${{ github.event.inputs.lb_tag || github.ref_name }}
 
-  # LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
-  LIQUIBASE_REPORT_PATH: reports
+  LIQUIBASE_REPORT_PATH: az://${{ env.AZURE_CONTAINER }}
   
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
@@ -109,10 +105,3 @@ jobs:
       run: liquibase flow --flow-file=liquibase-build.flowfile.yaml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Auto-generated
-
-    - name: Upload Reports Artifact
-      if: always()
-      uses: ./.github/workflows/upload-reports
-      with:
-        job-type: deploy
-        upload-s3: true
