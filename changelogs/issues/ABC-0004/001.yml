@@ -2,6 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: update_sql2
       author: asmith
+      labels:  "abc-0004"
       changes:
         - sqlFile:
             path: scripts/dbo.Proc_TestProc.v2.sql
