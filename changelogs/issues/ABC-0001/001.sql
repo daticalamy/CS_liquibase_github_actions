@@ -35,7 +35,3 @@ create table Sales.Kpis2 (
 );
 --rollback DROP TABLE Sales.Kpis2;
 
---changeset amy.smith:delete_test_01
-delete from Sales.Kpis2;
---rollback empty
-
