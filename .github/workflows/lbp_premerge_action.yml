@@ -4,7 +4,7 @@
 #  This action spins up a temporary/ephemeral database 
 #  Liquibase changesets and destroys the copy at the end.
 #####################################################################
-name: 'Liquibase Premerge Job'
+name: 'Liquibase Premerge Job' 
 run-name: premerge of current repo by ${{ github.actor }}
 
 on:
