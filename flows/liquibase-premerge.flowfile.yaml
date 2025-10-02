@@ -33,6 +33,7 @@ stages:
     actions:
       - type: liquibase
         command: update-sql
+        globalArgs: { reports-name: "sql-premerge-report.html"}
 
   # Create Clone Database
   Create-EphemeralDB:
