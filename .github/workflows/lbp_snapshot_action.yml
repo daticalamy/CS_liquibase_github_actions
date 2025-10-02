@@ -77,4 +77,4 @@ jobs:
       uses: ./.github/workflows/setup-liquibase
  
     - name: Liquibase Snapshot Flow
-      run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-snapshot.flowfile.yaml
+      run: liquibase flow --flow-file=liquibase-snapshot.flowfile.yaml
