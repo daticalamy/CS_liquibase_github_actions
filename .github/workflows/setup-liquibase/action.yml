@@ -12,7 +12,7 @@ runs:
         java-version: '17'
 
     - name: Setup Liquibase Pro
-      uses: liquibase/setup-liquibase@v1
+      uses: liquibase/setup-liquibase@v2
       with:
         version: '5.0.0'
         edition: 'secure'
