@@ -20,6 +20,7 @@ stages:
         if: "${ROLLBACK_TYPE} == rollback_to_tag"
         command: rollback-sql
         cmdArgs: {tag: "${LB_TAG_OR_LABEL}"}
+        globalArgs: { reports-name: "sql-rollback-report-${ENV}.html" }
 
   Rollback-To-Tag:
     actions:
@@ -35,6 +36,7 @@ stages:
         if: "${ROLLBACK_TYPE} == rollback_by_label"
         command: rollback-sql
         cmdArgs: {tag: "initial_tag_v0", label-filter: "${LB_TAG_OR_LABEL}"}
+        globalArgs: { reports-name: "sql-rollback-report-${ENV}.html" }
 
   Rollback-By-Label:
     actions:

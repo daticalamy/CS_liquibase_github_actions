@@ -51,6 +51,7 @@ stages:
     actions:
       - type: liquibase
         command: update-sql
+        globalArgs: { reports-name: "sql-deploy-report-${ENV}.html" }
 
   Tag:
     actions:
