@@ -63,7 +63,7 @@ env:
   BRANCH: ${{ github.ref_name }}
   LB_TAG: ${{ github.event.inputs.lb_tag || github.ref_name }}
 
-  LIQUIBASE_REPORT_PATH: az://${{ env.AZURE_CONTAINER }}
+  LIQUIBASE_REPORT_PATH: az://${{ env.AZURE_CONTAINER }}/gh_sqlserver/reports
   
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
