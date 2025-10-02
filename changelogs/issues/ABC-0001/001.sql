@@ -40,4 +40,4 @@ create table Sales.Targets01 (
   id int, 
   name varchar(30) 
 );
---rollback DROP TABLE Sales.Targets01;
+--rollback DROP TABLE Sales.Targets01a;

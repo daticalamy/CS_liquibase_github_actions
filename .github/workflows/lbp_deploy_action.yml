@@ -1,9 +1,9 @@
 ####################################################################
 #  GitHub Action to perform an environment-targeted deployment of
-#  database changes using Liquibase Pro, Liquibase Pro Flows,
-#  Custom Quality checks and S3.
+#  database changes using Liquibase Secure, Flows, Azure Storage,
+#  and Custom Policy checks.
 #####################################################################
-name: 'Liquibase Pro Deployment Job'
+name: 'Liquibase Deployment Job'
 run-name: ${{ inputs.environment}} deployment of current repo by ${{ github.actor }}
 
 on:
@@ -31,16 +31,11 @@ on:
 #  Set up the environment
 #####################################################################
 env:
-  # AWS S3 bucket is the host part of the S3 bucket
-  AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-  
-  # AWS Access credentials use by the Liquibase Pro S3 Extension
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-
-  # Default AWS region
-  AWS_REGION: us-east-1
+  # Azure Storage account and container to hold reports
+  LIQUIBASE_AZURE_STORAGE_ACCOUNT: cssnapshots
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
   
   # Pro License key
   # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
@@ -79,8 +74,7 @@ env:
   LIQUIBASE_LOG_FILE: logs/log.json
   LIQUIBASE_DBCLHISTORY_ENABLED: true 
   
-  # LIQUIBASE_REPORT_PATH: s3://${{ secrets.AWS_S3_BUCKET }}/gha_reports
-  LIQUIBASE_REPORT_PATH: reports
+  LIQUIBASE_REPORT_PATH: az://reports/gh_sqlserver_reports
 
 jobs:
   #########################################################################
@@ -103,7 +97,7 @@ jobs:
       id: lbp-policy-checks
       run: |       
         set +e
-        CHECKS_STATUS=$(liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-checks.flowfile.yaml 2>&1)
+        CHECKS_STATUS=$(liquibase flow --flow-file=liquibase-checks.flowfile.yaml 2>&1)
         EXIT_CODE=$?
         set -e
         
@@ -116,12 +110,6 @@ jobs:
           echo "exit_message=✅ Liquibase checks passed" >> $GITHUB_OUTPUT
           echo "✅ Proceeding automatically"
         fi
-
-    - name: Upload Reports Artifact
-      if: always()
-      uses: ./.github/workflows/upload-reports
-      with:
-        job-type: checks
       
   manual-approval:
     runs-on: [self-hosted]
@@ -150,11 +138,4 @@ jobs:
       uses: ./.github/workflows/setup-liquibase
 
     - name: Liquibase Deploy Flow
-      run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-deploy.flowfile.yaml
-
-    - name: Upload Reports Artifact
-      if: always()
-      uses: ./.github/workflows/upload-reports
-      with:
-        job-type: deploy
-        upload-s3: true
+      run: liquibase flow --flow-file=liquibase-deploy.flowfile.yaml

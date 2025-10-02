@@ -5,8 +5,8 @@ globalVariables:
   ROLLBACK_TYPE: ${ROLLBACK_TYPE}
   TAG_OR_LABEL: ${LB_TAG_OR_LABEL}
   ENV: ${ENVIRONMENT}
-  BUCKET: ${AWS_S3_BUCKET}
-  SCHEMAS: ${LB_SCHEMAS} 
+  SCHEMAS: ${LB_SCHEMAS}
+  CONTAINER: ${AZURE_CONTAINER} 
 
 stages:
   Rollback-Logging:
@@ -55,10 +55,10 @@ endStage:
     - type: liquibase
       command: snapshot
       cmdArgs: {  snapshot-format: json, schemas: "${SCHEMAS}", snapshot-filters: "column,foreignkey,index,primarykey,table,uniqueconstraint,view,checkconstraint,trigger"}
-      globalArgs: { output-file: 's3://${BUCKET}/gh_sqlserver_snapshots/${ENV}-snapshot.json' }
+      globalArgs: { output-file: 'az://${CONTAINER}/gh_sqlserver_snapshots/${ENV}-snapshot.json' }
         
     - type: shell
-      command: echo 'Updated snapshot saved to s3://${BUCKET}/gh_sqlserver_snapshots/${ENV}-snapshot.json'   
+      command: echo 'Updated snapshot saved to az://${CONTAINER}/gh_sqlserver_snapshots/${ENV}-snapshot.json'   
 
     - type: liquibase
       command: history

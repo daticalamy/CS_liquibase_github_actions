@@ -3,7 +3,7 @@
 
 globalVariables:
   ENV: ${ENVIRONMENT}
-  BUCKET: ${AWS_S3_BUCKET}
+  CONTAINER: ${AZURE_CONTAINER} 
   TAG: ${LB_TAG}
   CHECK_DRIFT: ${LB_CHECK_DRIFT}
   SCHEMAS: ${LB_SCHEMAS}
@@ -81,10 +81,10 @@ endStage:
     - type: liquibase
       command: snapshot
       cmdArgs: {  snapshot-format: json, schemas: "${SCHEMAS}", snapshot-filters: "column,foreignkey,index,primarykey,table,uniqueconstraint,view,checkconstraint,trigger"}
-      globalArgs: { output-file: 's3://${BUCKET}/gh_sqlserver_snapshots/${ENV}-snapshot.json' }
+      globalArgs: { output-file: 'az://${CONTAINER}/gh_sqlserver_snapshots/${ENV}-snapshot.json' }
         
     - type: shell
-      command: echo 'Updated snapshot saved to s3://${BUCKET}/gh_sqlserver_snapshots/${ENV}-snapshot.json'  
+      command: echo 'Updated snapshot saved to az://${CONTAINER}/gh_sqlserver_snapshots/${ENV}-snapshot.json'  
   
     - type: liquibase
       command: history
