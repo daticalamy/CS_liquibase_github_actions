@@ -1,6 +1,6 @@
 # .github/workflows/setup-liquibase/action.yml
 name: 'Setup Liquibase Environment'
-description: 'Sets up Java, Liquibase Pro, and AWS extension'
+description: 'Sets up Java, Liquibase Secure, and Azure extension'
 
 runs:
   using: 'composite'
