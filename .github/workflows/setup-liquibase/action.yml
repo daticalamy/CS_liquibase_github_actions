@@ -1,6 +1,6 @@
 # .github/workflows/setup-liquibase/action.yml
 name: 'Setup Liquibase Environment'
-description: 'Sets up Java, Liquibase Secure, and Azure extension'
+description: 'Sets up Java and Liquibase Secure'
 
 runs:
   using: 'composite'
@@ -16,8 +16,3 @@ runs:
       with:
         version: '5.0.0'
         edition: 'secure'
-
-#    - name: Download AWS Extension
-#      shell: bash
-#      run: |
-#        wget -O liquibase-aws-extension.jar https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-aws-extension/1.0.1/liquibase-aws-extension-1.0.1.jar
