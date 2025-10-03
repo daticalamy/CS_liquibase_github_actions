@@ -11,7 +11,7 @@ runs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Setup Liquibase Pro
+    - name: Setup Liquibase Secure
       uses: liquibase/setup-liquibase@v2
       with:
         version: '5.0.0'
