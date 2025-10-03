@@ -4,14 +4,14 @@
 globalVariables:
   ENV: ${ENVIRONMENT}
   CONTAINER: ${AZURE_CONTAINER}
+  SCHEMAS: ${LB_SCHEMAS}
 
 stages:
   Snapshot:
     actions:
       - type: liquibase
         command: snapshot
-        cmdArgs: 
-          {  snapshot-format: json }
+        cmdArgs: {  snapshot-format: json, schemas: "${SCHEMAS}", snapshot-filters: "column,foreignkey,index,primarykey,table,uniqueconstraint,view,checkconstraint,trigger"}
         globalArgs: { output-file: 'az://${CONTAINER}/gh_sqlserver_snapshots/${ENV}-snapshot.json' }
         
       - type: shell

@@ -1,3 +1,5 @@
 logs/
 liquibase.properties
 reports/
+.liquibase
+data/
