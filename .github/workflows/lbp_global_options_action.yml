@@ -43,6 +43,9 @@ env:
   # Search path (See https://docs.liquibase.com/concepts/changelogs/how-liquibase-finds-files.html)
   LIQUIBASE_SEARCH_PATH: flows, checks, changelogs
   
+  # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
+  LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog.yaml
+  
   ENVIRONMENT: ${{ inputs.environment }}
   LB_SCHEMAS: "DBO,Sales"
   
