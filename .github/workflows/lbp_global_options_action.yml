@@ -65,9 +65,12 @@ jobs:
     
     - name: Setup Liquibase Environment
       uses: ./.github/workflows/setup-liquibase
+
+    - name: Liquibase Status
+      run: liquibase --database-changelog-table-name=dbcl2 status
  
     - name: Liquibase Tag
-      run: liquibase tag --database-changelog-table-name=dbcl2
+      run: liquibase --database-changelog-table-name=dbcl2 tag
       
     - name: Liquibase Update
-      run: liquibase update --database-changelog-table-name=dbcl2
+      run: liquibase --database-changelog-table-name=dbcl2 update
