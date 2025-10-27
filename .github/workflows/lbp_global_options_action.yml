@@ -73,7 +73,7 @@ jobs:
       run: liquibase --database-changelog-table-name=dbcl2 status
  
     - name: Liquibase Tag
-      run: liquibase --database-changelog-table-name=dbcl2 tag
+      run: liquibase --database-changelog-table-name=dbcl2 tag --tag=TAG1 
       
     - name: Liquibase Update
       run: liquibase --database-changelog-table-name=dbcl2 update
