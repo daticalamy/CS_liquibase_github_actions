@@ -1,6 +1,6 @@
 # .github/workflows/setup-liquibase/action.yml
 name: 'Setup Liquibase Environment'
-description: 'Sets up Java and Liquibase Secure'
+description: 'Sets up Liquibase Secure'
 
 runs:
   using: 'composite'
