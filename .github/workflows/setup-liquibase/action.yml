@@ -14,5 +14,6 @@ runs:
     - name: Setup Liquibase Secure
       uses: liquibase/setup-liquibase@v2
       with:
-        version: '5.0.0'
+        version: '5.1.0-RC114'
         edition: 'secure'
+        download-url-base: 'https://repo.liquibase.com/non-releases/secure/5.1.0-RC114/liquibase-secure-5.1.0-RC114.tar.gz'
