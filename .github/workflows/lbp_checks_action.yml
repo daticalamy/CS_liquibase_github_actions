@@ -52,28 +52,31 @@ env:
   LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog.yaml
 
   # Checks Settings
+  LIQUIBASE_COMMAND_CHECKS_RUN_AUTO_UPDATE: off  
   LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_SCRIPTS_ENABLED: true
   # LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_SCRIPTS_PATH: pythonchecks
-  ENVIRONMENT: ${{ inputs.environment }}
   XDG_CACHE_HOME: /tmp
   LIQUIBASE_SCRIPT_PYTHON_EXECUTABLE_PATH: checks/pii_poc_env/bin/python
-
   # The Full Path below causes an "Python virtual environment" error. Needs to be a relative path for this action.
   # LIQUIBASE_SCRIPT_PYTHON_EXECUTABLE_PATH: venv/bin/graalpy
   # LIQUIBASE_SCRIPT_PYTHON_EXECUTABLE_PATH: /__w/CS_liquibase_github_actions/CS_liquibase_github_actions/venv/bin/graalpy
-  CURRENT_BRANCH: main
   PYTHON_CHECKS_GITHUB_TOKEN: ${{ secrets.PYTHON_CHECKS_GITHUB_TOKEN }}
-  
+
+  CURRENT_BRANCH: main
+  ENVIRONMENT: ${{ inputs.environment }}  
   BRANCH: ${{ github.ref_name }}
 
+  # Reports
   LIQUIBASE_REPORT_PATH: az://reports/gh_sqlserver_reports
   
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
   LIQUIBASE_LOG_FORMAT: JSON_PRETTY
   LIQUIBASE_LOG_FILE: logs/log.json
+  
+  # History Table
   LIQUIBASE_DBCLHISTORY_ENABLED: true
-
+ 
 jobs:
   #########################################################################
   #  Checks

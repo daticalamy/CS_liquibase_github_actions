@@ -62,13 +62,19 @@ env:
   BRANCH: ${{ github.ref_name }}
   LB_TAG: ${{ github.event.inputs.lb_tag || github.ref_name }}
 
+  # Reports
   LIQUIBASE_REPORT_PATH: az://reports/gh_sqlserver_reports
   
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
   LIQUIBASE_LOG_FORMAT: JSON_PRETTY
   LIQUIBASE_LOG_FILE: logs/log.json
+  
+  # History Table
   LIQUIBASE_DBCLHISTORY_ENABLED: true
+  
+  # Checks Settings
+  LIQUIBASE_COMMAND_CHECKS_RUN_AUTO_UPDATE: off
 
 jobs:
   #########################################################################

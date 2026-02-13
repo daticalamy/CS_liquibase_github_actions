@@ -70,12 +70,15 @@ env:
   LB_TAG_OR_LABEL: ${{ github.event.inputs.lb_tag_or_label }}
   LB_SCHEMAS: "DBO,Sales"
   
+  # Reports
   LIQUIBASE_REPORT_PATH: az://reports/gh_sqlserver_reports
   
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
   LIQUIBASE_LOG_FORMAT: JSON_PRETTY
   LIQUIBASE_LOG_FILE: logs/log.json
+
+  # History Table
   LIQUIBASE_DBCLHISTORY_ENABLED: true
 
 jobs:

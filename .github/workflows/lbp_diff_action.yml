@@ -64,13 +64,17 @@ env:
   
   LB_SCHEMAS: "DBO,Sales"
   
-  LIQUIBASE_REPORT_PATH: az://reports/gh_sqlserver_reports
+  # History Table
+  LIQUIBASE_DBCLHISTORY_ENABLED: true
   
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
   LIQUIBASE_LOG_FORMAT: JSON_PRETTY
   LIQUIBASE_LOG_FILE: logs/log.json
+
+  # History Table
   LIQUIBASE_DBCLHISTORY_ENABLED: true
+
 
 jobs:
   #########################################################################

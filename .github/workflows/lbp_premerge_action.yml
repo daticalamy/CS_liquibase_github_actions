@@ -59,19 +59,25 @@ env:
   ENVIRONMENT: DEV
   LB_TAG: ${{ github.ref_name }}
 
+  # Reports
   LIQUIBASE_REPORT_PATH: az://reports/gh_sqlserver_reports
   
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
   LIQUIBASE_LOG_FORMAT: JSON_PRETTY
   LIQUIBASE_LOG_FILE: logs/log.json
-  LIQUIBASE_DBCLHISTORY_ENABLED: true  
-  
+
+  # History Table
+  LIQUIBASE_DBCLHISTORY_ENABLED: true
+
   # Prevalidate Settings
   LB_CLONED_URL: "jdbc:sqlserver://${{ secrets.LIQUIBASE_HOSTNAME }}:${{ secrets.LIQUIBASE_PORT }};databaseName=${{ secrets.LIQUIBASE_DATABASE_NAME }}_eph;trustServerCertificate=true"
   LB_DATABASENAME: "${{ secrets.LIQUIBASE_DATABASE_NAME }}"
   LB_HOSTNAME: "${{ secrets.LIQUIBASE_HOSTNAME }}"
   LB_PORT: "${{ secrets.LIQUIBASE_PORT }}"
+  
+  # Checks Settings
+  LIQUIBASE_COMMAND_CHECKS_RUN_AUTO_UPDATE: off
 
 jobs:
   #########################################################################
