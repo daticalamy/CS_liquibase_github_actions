@@ -63,7 +63,8 @@ env:
   LB_TAG: ${{ github.event.inputs.lb_tag || github.ref_name }}
 
   # Reports
-  LIQUIBASE_REPORT_PATH: az://reports/gh_sqlserver_reports
+  #LIQUIBASE_REPORT_PATH: az://reports/gh_sqlserver_reports
+  LIQUIBASE_REPORT_PATH: reports
   
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
@@ -95,7 +96,6 @@ jobs:
       continue-on-error: true
       run: | 
         set +e
-        # CHECKS_STATUS=$(liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-checks.flowfile.yaml 2>&1)
         CHECKS_STATUS=$(liquibase flow --flow-file=liquibase-checks.flowfile.yaml 2>&1)
         EXIT_CODE=$?
         set -e
@@ -106,7 +106,13 @@ jobs:
         fi
 
     - name: Liquibase Build Flow
-      # run: liquibase flow --classpath=liquibase-aws-extension.jar --flow-file=liquibase-build.flowfile.yaml
       run: liquibase flow --flow-file=liquibase-build.flowfile.yaml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Auto-generated
+
+    - name: Upload Reports Artifact
+      if: always()
+      uses: ./.github/workflows/upload-reports
+      with:
+        job-type: deploy
+        upload-other: false
