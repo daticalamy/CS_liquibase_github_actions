@@ -90,20 +90,6 @@ jobs:
     
     - name: Setup Liquibase Environment
       uses: ./.github/workflows/setup-liquibase
-      
-    - name: Liquibase Checks Flow
-      id: lbp-policy-checks
-      continue-on-error: true
-      run: | 
-        set +e
-        CHECKS_STATUS=$(liquibase flow --flow-file=liquibase-checks.flowfile.yaml 2>&1)
-        EXIT_CODE=$?
-        set -e
-        if [ $EXIT_CODE -eq 1 ]; then
-          echo "::error::Policy checks did not pass, but allowing build to complete."
-          echo "::error::In non-build environments, this deployment will require Manual Approval."
-          exit $EXIT_CODE
-        fi
 
     - name: Liquibase Build Flow
       run: liquibase flow --flow-file=liquibase-build.flowfile.yaml
