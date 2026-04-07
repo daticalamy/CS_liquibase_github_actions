@@ -36,11 +36,12 @@ env:
   
   # JDBC URL of the database per environment
   # See https://docs.liquibase.com/workflows/liquibase-community/using-jdbc-url-in-liquibase.html
-  LIQUIBASE_COMMAND_URL: ${{ vars.LIQUIBASE_URL }}
+  #LIQUIBASE_COMMAND_URL: ${{ vars.LIQUIBASE_URL }}
+  LIQUIBASE_COMMAND_URL: ${{ vars.LIQUIBASE_URL_INTEGRATED_SECURITY }}
 
   # Credentials for the environment's database https://docs.liquibase.com/parameters/command-parameters.html
-  LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
-  LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
+  #LIQUIBASE_COMMAND_USERNAME: ${{ secrets.LIQUIBASE_USERNAME }}
+  #LIQUIBASE_COMMAND_PASSWORD: ${{ secrets.LIQUIBASE_PASSWORD }}
 
   # Liquibase schema: Specified to allow flexibility in storage of Liquibase Change Tracking Tables
   # See https://docs.liquibase.com/parameters/liquibase-schema-name.html
