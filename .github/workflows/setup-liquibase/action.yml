@@ -11,8 +11,23 @@ runs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Setup Liquibase Secure
-      uses: liquibase/setup-liquibase@v2
-      with:
-        version: '5.1.0'
-        edition: 'secure'
+#    - name: Setup Liquibase Secure
+#      uses: liquibase/setup-liquibase@v2
+#      with:
+#        version: '5.1.0'
+#        edition: 'secure'
+
+    - name: Install Liquibase from local zip
+      shell: powershell
+      run: |
+        $src  = "C:\liquibase-installers\liquibase-secure-5.1.1.zip"
+        $dest = "C:\liquibase-secure"
+
+        if (-not (Test-Path $src)) {
+          Write-Error "Liquibase zip not found at $src — please place it there manually before running."
+          exit 1
+        }
+
+        Expand-Archive -LiteralPath $src -DestinationPath $dest -Force
+        echo "$dest" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        Write-Host "✅ Liquibase installed to $dest and added to PATH"
