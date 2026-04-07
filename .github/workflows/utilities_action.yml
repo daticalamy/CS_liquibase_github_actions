@@ -72,7 +72,7 @@ jobs:
   #########################################################################
 
   database-utilities:
-    runs-on: [self-hosted]
+    runs-on: [self-hosted, Windows]
     environment: ${{ inputs.environment }}
     steps:
     - uses: actions/checkout@v4
