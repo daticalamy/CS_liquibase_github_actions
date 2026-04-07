@@ -1,19 +1,28 @@
-#############################################################################
-#  GitHub Action to run Liquibase Python Policy Checks.
-##############################################################################
-name: 'Liquibase Checks'
-run-name: ${{ inputs.environment}} checks of current repo by ${{ github.actor }}
+####################################################################
+#  GitHub Action to perform diff / drift detection between two 
+#  database environments.
+#####################################################################
+name: 'Liquibase Diff'
+run-name: ${{ inputs.source_environment}} and ${{ inputs.target_environment}} diff by ${{ github.actor }}
 
 on:
   workflow_dispatch:
     # Following are the inputs received via the GitHubActions Run workflow dialog
     inputs:
-      # The type 'environment' will automatically pull in the environments created in GitHub
-      environment:
-        description: 'Environment for checks'
+
+      source_environment:
+        description: 'Source Environment'
         type: environment
         required: true
-        default: DEV
+
+      target_environment:
+        description: 'Target Environment'
+        required: true
+        type: choice
+        options:
+          - DEV
+          - TEST
+          - PROD 
 
 ####################################################################
 #  Set up the environment
@@ -27,7 +36,7 @@ env:
   
   # Pro License key
   # See https://docs.liquibase.com/workflows/liquibase-pro/how-to-apply-your-liquibase-pro-license-key.html
-  LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_PRO_LICENSE_KEY }}
+  LIQUIBASE_LICENSE_KEY: ${{ secrets.LIQUIBASE_LICENSE_KEY }}
   
   # JDBC URL of the database per environment
   # See https://docs.liquibase.com/workflows/liquibase-community/using-jdbc-url-in-liquibase.html
@@ -50,49 +59,33 @@ env:
   
   # The database changelog. See https://docs.liquibase.com/concepts/changelogs/working-with-changelogs.html
   LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog.yaml
-
-  # Checks Settings
-  LIQUIBASE_COMMAND_CHECKS_RUN_AUTO_UPDATE: off  
-  LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_SCRIPTS_ENABLED: true
-  # LIQUIBASE_COMMAND_CHECKS_RUN_CHECKS_SCRIPTS_PATH: pythonchecks
-  XDG_CACHE_HOME: /tmp
-  LIQUIBASE_SCRIPT_PYTHON_EXECUTABLE_PATH: checks/pii_poc_env/bin/python
-  # The Full Path below causes an "Python virtual environment" error. Needs to be a relative path for this action.
-  # LIQUIBASE_SCRIPT_PYTHON_EXECUTABLE_PATH: venv/bin/graalpy
-  # LIQUIBASE_SCRIPT_PYTHON_EXECUTABLE_PATH: /__w/CS_liquibase_github_actions/CS_liquibase_github_actions/venv/bin/graalpy
-  PYTHON_CHECKS_GITHUB_TOKEN: ${{ secrets.PYTHON_CHECKS_GITHUB_TOKEN }}
-
-  CURRENT_BRANCH: main
-  ENVIRONMENT: ${{ inputs.environment }}  
-  BRANCH: ${{ github.ref_name }}
-
-  # Reports
-  LIQUIBASE_REPORT_PATH: az://reports/gh_sqlserver_reports
+  
+  ENVIRONMENT: ${{ inputs.source_environment }}
+  
+  LB_SCHEMAS: "DBO,Sales"
   
   # Values: OFF, SEVERE, WARNING, INFO, FINE
   LIQUIBASE_LOG_LEVEL: INFO
   LIQUIBASE_LOG_FORMAT: JSON_PRETTY
   LIQUIBASE_LOG_FILE: logs/log.json
-  
+
   # History Table
   LIQUIBASE_DBCLHISTORY_ENABLED: true
- 
+
+
 jobs:
   #########################################################################
-  #  Checks
+  #  Diff
   #########################################################################
 
-  database-checks:
+  diff:
     runs-on: [self-hosted]
-    environment: ${{ inputs.environment }}
+    environment: ${{ inputs.source_environment }}
     steps:
     - uses: actions/checkout@v4
     
     - name: Setup Liquibase Environment
       uses: ./.github/workflows/setup-liquibase
-      
-    - name: Liquibase Checks Flow
-      id: lbp-policy-checks
-      continue-on-error: true
-      run: | 
-        liquibase flow --flow-file=liquibase-checks.flowfile.yaml
+ 
+    - name: Liquibase Diff Flow
+      run: liquibase flow --flow-file=liquibase-drift.flowfile.yaml
