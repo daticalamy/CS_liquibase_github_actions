@@ -47,7 +47,7 @@ runs:
         Invoke-WebRequest -Uri $DllUrl -OutFile $DllPath -UseBasicParsing
 
         if (-not (Test-Path $DllPath)) {
-          Write-Error "DLL download failed — $DllPath not found."
+          Write-Error "DLL download failed - $DllPath not found."
           exit 1
         }
         Write-Host "Download complete: $((Get-Item $DllPath).Length) bytes"
