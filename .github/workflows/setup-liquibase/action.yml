@@ -24,7 +24,7 @@ runs:
         $dest = "C:\liquibase-secure"
 
         if (-not (Test-Path $src)) {
-          Write-Error "Liquibase zip not found at $src — please place it there manually before running."
+          Write-Error "Liquibase zip not found at $src - please place it there manually before running."
           exit 1
         }
 
