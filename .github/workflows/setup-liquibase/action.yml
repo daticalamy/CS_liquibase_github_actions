@@ -30,4 +30,4 @@ runs:
 
         Expand-Archive -LiteralPath $src -DestinationPath $dest -Force
         echo "$dest" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        Write-Host "✅ Liquibase installed to $dest and added to PATH"
+        Write-Host "Liquibase installed to $dest and added to PATH"
