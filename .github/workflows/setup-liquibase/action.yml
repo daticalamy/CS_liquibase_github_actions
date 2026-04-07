@@ -52,13 +52,8 @@ runs:
         }
         Write-Host "Download complete: $((Get-Item $DllPath).Length) bytes"
 
-    - name: Set java.library.path for Liquibase
+    - name: Set PATH for Liquibase
       shell: powershell
       run: |
-        $InstallDir = "C:\mssql-auth"
-        $javaArg    = "-Djava.library.path=$InstallDir"
-
-        Write-Host "Setting LIQUIBASE_JAVA_ARGS = $javaArg"
-
-        "MSSQL_AUTH_LIB_DIR=$InstallDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-        "LIQUIBASE_JAVA_ARGS=$javaArg"   | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        $InstallDir = "C:\mssql-auth"        
+        echo $InstallDir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
