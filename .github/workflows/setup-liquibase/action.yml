@@ -50,7 +50,7 @@ runs:
           Write-Error "DLL download failed — $DllPath not found."
           exit 1
         }
-        Write-Host "Download complete: $(Get-Item $DllPath | Select-Object -ExpandProperty Length) bytes"
+        Write-Host "Download complete: $((Get-Item $DllPath).Length) bytes"
 
     - name: Set java.library.path for Liquibase
       shell: powershell
